@@ -20,6 +20,7 @@ class CPLUSHELL_API ACphBaseCharacter final : public ACharacter
     GENERATED_BODY()
 
 public:
+    // Constructor
     // Sets default values for this character's properties
     ACphBaseCharacter();
 
@@ -41,9 +42,23 @@ public:
     virtual void SetupPlayerInputComponent(
         class UInputComponent* PlayerInputComponent) override;
 
+    // Tell for blueprint, if character is running
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    bool IsRunning() const;
+
 private:
+    // Variables
+    // Indicates character wish to run
+    bool IsReadyToRun = false;
+    bool IsMovingForward = false;
+
+    // Functions
     // Calls then character moves by MoveForward action mapping 
     void MoveForward(float Amount);
     // Calls then character moves by MoveRight action mapping
     void MoveRight(float Amount);
+    // Pressed acceleration key
+    void OnStartRunning();
+    // Released acceleration key
+    void OnStopRunning();
 };

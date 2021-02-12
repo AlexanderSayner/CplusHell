@@ -58,11 +58,30 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     // Turning character itself
     PlayerInputComponent->BindAxis("LookAround", this,
                                    &ACphBaseCharacter::AddControllerYawInput);
+
+    // Jump!
+    PlayerInputComponent->BindAction("Jump", IE_Pressed, this,
+                                     &ACphBaseCharacter::Jump);
+
+    // Running control
+    PlayerInputComponent->BindAction("Run", IE_Pressed, this,
+                                     &ACphBaseCharacter::OnStartRunning);
+    PlayerInputComponent->BindAction("Run", IE_Released, this,
+                                     &ACphBaseCharacter::OnStopRunning);
+}
+
+// Tell for blueprint, if character is running
+bool ACphBaseCharacter::IsRunning() const
+{
+    // Pressed LShift and W and speed is not a zero
+    return IsReadyToRun && IsMovingForward && !GetVelocity().IsZero();
 }
 
 // Calls then character moves by MoveForward action mapping 
 void ACphBaseCharacter::MoveForward(float const Amount)
 {
+    // If i am moving forward, i can run
+    IsMovingForward = Amount > 0.0f;
     // AddMovementInput is a part of Pawn and allows it to move.
     AddMovementInput(
         GetActorForwardVector(), // Go wherever character looks
@@ -73,4 +92,14 @@ void ACphBaseCharacter::MoveForward(float const Amount)
 void ACphBaseCharacter::MoveRight(float const Amount)
 {
     AddMovementInput(GetActorRightVector(), Amount);
+}
+
+void ACphBaseCharacter::OnStartRunning()
+{
+    IsReadyToRun = true;
+}
+
+void ACphBaseCharacter::OnStopRunning()
+{
+    IsReadyToRun = false;
 }
