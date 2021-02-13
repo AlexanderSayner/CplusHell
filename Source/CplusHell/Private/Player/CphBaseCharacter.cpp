@@ -82,6 +82,27 @@ bool ACphBaseCharacter::IsRunning() const
     return IsReadyToRun && IsMovingForward && !GetVelocity().IsZero();
 }
 
+// Tell for blueprint, there player looks
+float ACphBaseCharacter::GetMovementDirection() const
+{
+    // No need to calculate if player doesn't move
+    if (GetVelocity().IsZero()) return 0.0f;
+    // Normal for vector of speed
+    const FVector Normal = GetVelocity().GetSafeNormal();
+    // Arc cosine from scalar product (dot product) between vector where camera looks and velocity normal 
+    const float AngleBetween = FMath::Acos(
+        FVector::DotProduct(GetActorForwardVector(), Normal));
+    // Orthogonal vector
+    const FVector CrossProduct = FVector::CrossProduct(
+        GetActorForwardVector(), Normal);
+    // Acos returns radians
+    const float AngleBetweenDegrees = FMath::RadiansToDegrees(AngleBetween);
+    // If Z < 0, then multiply -1, otherwise 1
+    return CrossProduct.IsZero()
+               ? AngleBetweenDegrees
+               : AngleBetweenDegrees * FMath::Sign(CrossProduct.Z);
+}
+
 // Calls then character moves by MoveForward action mapping 
 void ACphBaseCharacter::MoveForward(float const Amount)
 {

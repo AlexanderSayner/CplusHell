@@ -46,6 +46,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     bool IsRunning() const;
 
+    // Tell for blueprint, there player looks
+    UFUNCTION(BlueprintCallable,Category="Movement")
+    float GetMovementDirection() const;
+
 private:
     // Variables
     // Indicates character wish to run
