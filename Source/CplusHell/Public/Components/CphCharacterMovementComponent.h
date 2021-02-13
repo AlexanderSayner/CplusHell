@@ -16,7 +16,8 @@ class CPLUSHELL_API
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement",
+        meta = (ClampMin = "1.0", ClampMax = "10.0"))
     float RunModifier = 1.5f;
 
     // Setting max speed then character walk or run

@@ -22,7 +22,7 @@ class CPLUSHELL_API ACphBaseCharacter final : public ACharacter
 public:
     // Constructor
     // Sets default values for this character's properties
-    ACphBaseCharacter();
+    explicit ACphBaseCharacter(const FObjectInitializer& ObjInit);
 
 protected:
     // Smart camera controller
