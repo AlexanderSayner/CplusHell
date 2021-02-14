@@ -47,7 +47,7 @@ public:
     bool IsRunning() const;
 
     // Tell for blueprint, there player looks
-    UFUNCTION(BlueprintCallable,Category="Movement")
+    UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
 
 private:
