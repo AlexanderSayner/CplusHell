@@ -19,6 +19,9 @@ public:
     // Getter
     float GetHealth() const { return Health; }
 
+    UFUNCTION(BlueprintCallable)
+    bool IsAlive() const { return Health > 0.0f; }
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health",
         meta = (ClampMin = "0.0", ClampMax = "10000.0"))
@@ -32,8 +35,8 @@ private:
 
     UFUNCTION()
     void OnTakeAnyDamage(AActor* DamagedActor,
-                               float Damage,
-                               const class UDamageType* DamageType,
-                               class AController* InstigatedBy,
-                               AActor* DamageCauser);
+                         float Damage,
+                         const class UDamageType* DamageType,
+                         class AController* InstigatedBy,
+                         AActor* DamageCauser);
 };

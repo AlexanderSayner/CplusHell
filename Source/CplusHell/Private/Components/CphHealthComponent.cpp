@@ -40,7 +40,12 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
                                           AController* InstigatedBy,
                                           AActor* DamageCauser)
 {
-    Health -= Damage;
+    // Validation
+    if (Damage <= 0.0f || !IsAlive())
+        return;
+
+    // Health could not be less than 0, if damage is too big
+    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     UE_LOG(LogHealthComponent, Display, TEXT("Damage: %f"), Damage)
 
     if (DamageType)
