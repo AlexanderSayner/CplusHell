@@ -4,6 +4,7 @@
 #include "Dev/CphDevDamageActor.h"
 
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACphDevDamageActor::ACphDevDamageActor()
@@ -28,4 +29,14 @@ void ACphDevDamageActor::Tick(const float DeltaTime)
 
     // Debug damage sphere
     DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 16, SphereColor);
+    // Deal damage
+    UGameplayStatics::ApplyRadialDamage(GetWorld(),
+                                        Damage,
+                                        GetActorLocation(),
+                                        Radius,
+                                        nullptr,
+                                        {},
+                                        this,
+                                        nullptr,
+                                        DoFullDamage);
 }

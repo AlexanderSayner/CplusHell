@@ -16,14 +16,20 @@ public:
     ACphDevDamageActor();
 
     // Needs for ability to move component on scene
-    UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     USceneComponent* SceneComponent;
     // Damage debug sphere radius
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
     float Radius = 100.0f;
     // Color of damage sphere
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
     FColor SphereColor = FColor::Purple;
+    // Damage every tick
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+    float Damage = 5.0f;
+    // Is full damage all over of the sphere evenly?
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+    bool DoFullDamage = false;
 
 protected:
     // Called when the game starts or when spawned

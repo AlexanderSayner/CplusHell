@@ -3,6 +3,8 @@
 
 #include "Components/CphHealthComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
+
 // Sets default values for this component's properties
 UCphHealthComponent::UCphHealthComponent()
 {
@@ -36,4 +38,5 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
                                           AActor* DamageCauser)
 {
     Health -= Damage;
+    UE_LOG(LogHealthComponent, Display, TEXT("Damage: %f"), Damage)
 }
