@@ -51,10 +51,10 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
     // MoveForward and MoveRight is mapped in unreal editor project preferences
-    PlayerInputComponent->BindAxis(
-        "MoveForward", this, &ACphBaseCharacter::MoveForward);
-    PlayerInputComponent->BindAxis(
-        "MoveRight", this, &ACphBaseCharacter::MoveRight);
+    PlayerInputComponent->BindAxis("MoveForward", this,
+                                   &ACphBaseCharacter::MoveForward);
+    PlayerInputComponent->BindAxis("MoveRight", this,
+                                   &ACphBaseCharacter::MoveRight);
 
     // Set up mouse control
     // Set Input Pitch Scale to positive number to avoid inverse camera movement
@@ -68,18 +68,17 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this,
                                      &ACphBaseCharacter::Jump);
 
-    // Running control
-    PlayerInputComponent->BindAction("Run", IE_Pressed, this,
-                                     &ACphBaseCharacter::OnStartRunning);
-    PlayerInputComponent->BindAction("Run", IE_Released, this,
-                                     &ACphBaseCharacter::OnStopRunning);
+    // Sprint
+    PlayerInputComponent->BindAction("Sprint", IE_Pressed, this,
+                                     &ACphBaseCharacter::OnStartSprinting);
+    PlayerInputComponent->BindAction("Sprint", IE_Released, this,
+                                     &ACphBaseCharacter::OnStopSprinting);
 }
 
-// Tell for blueprint, if character is running
-bool ACphBaseCharacter::IsRunning() const
+// Tell for blueprint, if character is sprinting
+bool ACphBaseCharacter::IsSprinting() const
 {
-    // Pressed LShift and W and speed is not a zero
-    return IsReadyToRun && IsMovingForward && !GetVelocity().IsZero();
+    return IsReadyToSprint && IsMovingForward && !GetVelocity().IsZero();
 }
 
 // Tell for blueprint, there player looks
@@ -106,7 +105,7 @@ float ACphBaseCharacter::GetMovementDirection() const
 // Calls then character moves by MoveForward action mapping 
 void ACphBaseCharacter::MoveForward(float const Amount)
 {
-    // If i am moving forward, i can run
+    // If i am not falling, i can run
     IsMovingForward = Amount > 0.0f;
     // AddMovementInput is a part of Pawn and allows it to move.
     AddMovementInput(
@@ -117,15 +116,19 @@ void ACphBaseCharacter::MoveForward(float const Amount)
 // Calls then character moves by MoveRight action mapping
 void ACphBaseCharacter::MoveRight(float const Amount)
 {
-    AddMovementInput(GetActorRightVector(), Amount);
+    AddMovementInput(
+        GetActorRightVector(),
+        Amount);
 }
 
-void ACphBaseCharacter::OnStartRunning()
+// Pressed sprint key
+void ACphBaseCharacter::OnStartSprinting()
 {
-    IsReadyToRun = true;
+    IsReadyToSprint = true;
 }
 
-void ACphBaseCharacter::OnStopRunning()
+// Released sprint key
+void ACphBaseCharacter::OnStopSprinting()
 {
-    IsReadyToRun = false;
+    IsReadyToSprint = false;
 }

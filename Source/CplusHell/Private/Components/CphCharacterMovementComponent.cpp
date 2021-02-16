@@ -11,5 +11,8 @@ float UCphCharacterMovementComponent::GetMaxSpeed() const
     const float MaxSpeed = Super::GetMaxSpeed();
     // CphBaseCharacter is owner of this class
     const ACphBaseCharacter* Player = Cast<ACphBaseCharacter>(GetPawnOwner());
-    return Player && Player->IsRunning() ? MaxSpeed * RunModifier : MaxSpeed;
+    // Check: run or sprint otherwise just MaxSpeed
+    return Player && Player->IsSprinting()
+               ? MaxSpeed * SprintModifier
+               : MaxSpeed;
 }

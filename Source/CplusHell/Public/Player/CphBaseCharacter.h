@@ -42,9 +42,9 @@ public:
     virtual void SetupPlayerInputComponent(
         class UInputComponent* PlayerInputComponent) override;
 
-    // Tell for blueprint, if character is running
+    // Tell for blueprint, if character is sprinting
     UFUNCTION(BlueprintCallable, Category = "Movement")
-    bool IsRunning() const;
+    bool IsSprinting() const;
 
     // Tell for blueprint, there player looks
     UFUNCTION(BlueprintCallable, Category = "Movement")
@@ -53,8 +53,8 @@ public:
 private:
     // Variables
     // Indicates character wish to run
-    bool IsReadyToRun = false;
     bool IsMovingForward = false;
+    bool IsReadyToSprint = false;
 
     // Functions
     // Calls then character moves by MoveForward action mapping 
@@ -62,7 +62,7 @@ private:
     // Calls then character moves by MoveRight action mapping
     void MoveRight(float Amount);
     // Pressed acceleration key
-    void OnStartRunning();
+    void OnStartSprinting();
     // Released acceleration key
-    void OnStopRunning();
+    void OnStopSprinting();
 };
