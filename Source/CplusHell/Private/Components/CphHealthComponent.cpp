@@ -20,4 +20,20 @@ void UCphHealthComponent::BeginPlay()
     Super::BeginPlay();
 
     Health = MaxHealth;
+
+    AActor* ComponentOwner = GetOwner();
+    if (ComponentOwner)
+    {
+        ComponentOwner->OnTakeAnyDamage.AddDynamic(
+            this, &UCphHealthComponent::OnTakeAnyDamage);
+    }
+}
+
+void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
+                                          const float Damage,
+                                          const UDamageType* DamageType,
+                                          AController* InstigatedBy,
+                                          AActor* DamageCauser)
+{
+    Health -= Damage;
 }
