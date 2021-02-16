@@ -3,6 +3,9 @@
 
 #include "Components/CphHealthComponent.h"
 
+#include "Dev/CphFireDamageType.h"
+#include "Dev/CphIceDamageType.h"
+
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
 
 // Sets default values for this component's properties
@@ -39,4 +42,16 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
 {
     Health -= Damage;
     UE_LOG(LogHealthComponent, Display, TEXT("Damage: %f"), Damage)
+
+    if (DamageType)
+    {
+        if (DamageType->IsA<UCphFireDamageType>())
+        {
+            UE_LOG(LogHealthComponent, Display, TEXT("I am in fire!"))
+        }
+        else if (DamageType->IsA<UCphIceDamageType>())
+        {
+            UE_LOG(LogHealthComponent, Display, TEXT("It's so cold here"))
+        }
+    }
 }

@@ -30,6 +30,9 @@ public:
     // Is full damage all over of the sphere evenly?
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
     bool DoFullDamage = false;
+    //
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+    TSubclassOf<UDamageType> DamageType;
 
 protected:
     // Called when the game starts or when spawned

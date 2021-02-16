@@ -34,7 +34,7 @@ void ACphDevDamageActor::Tick(const float DeltaTime)
                                         Damage,
                                         GetActorLocation(),
                                         Radius,
-                                        nullptr,
+                                        DamageType,
                                         {},
                                         this,
                                         nullptr,
