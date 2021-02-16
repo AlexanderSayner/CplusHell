@@ -5,6 +5,8 @@
 
 
 #include "Components/CphCharacterMovementComponent.h"
+#include "Components/CphHealthComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -30,18 +32,36 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
         "CameraComponent");
     // Attach camera to SpringArm
     CameraComponent->SetupAttachment(SpringArmComponent);
+
+    // For logical components no need to SetupAttachment
+    HealthComponent = CreateDefaultSubobject<UCphHealthComponent>(
+        "HealthComponent");
+
+    // Set up health number
+    HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>(
+        "HealthTextComponent");
+    HealthTextComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void ACphBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    // Checking for null only in debug and development mode
+    check(HealthComponent)
+    check(HealthTextComponent)
 }
 
 // Called every frame
 void ACphBaseCharacter::Tick(float const DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    // Display health number
+    const float Health = HealthComponent->GetHealth();
+    HealthTextComponent->SetText(
+        FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
 
 // Called to bind functionality to input
@@ -97,9 +117,7 @@ float ACphBaseCharacter::GetMovementDirection() const
     // Acos returns radians
     const float AngleBetweenDegrees = FMath::RadiansToDegrees(AngleBetween);
     // If Z < 0, then multiply -1, otherwise 1
-    return CrossProduct.IsZero()
-               ? AngleBetweenDegrees
-               : AngleBetweenDegrees * FMath::Sign(CrossProduct.Z);
+    return AngleBetweenDegrees * FMath::Sign(CrossProduct.Z);
 }
 
 // Calls then character moves by MoveForward action mapping 

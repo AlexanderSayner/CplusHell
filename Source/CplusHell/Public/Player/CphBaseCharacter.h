@@ -10,6 +10,8 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UCphHealthComponent;
+class UTextRenderComponent;
 
 /*
  * My main awesome character
@@ -31,6 +33,12 @@ protected:
     // Getting ful control on camera
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCameraComponent* CameraComponent;
+    // Allows to display health status above character
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UCphHealthComponent* HealthComponent;
+    // For display health number
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UTextRenderComponent* HealthTextComponent;
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
