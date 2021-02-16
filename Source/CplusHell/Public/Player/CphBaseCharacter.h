@@ -73,4 +73,6 @@ private:
     void OnStartSprinting();
     // Released acceleration key
     void OnStopSprinting();
+    // For playing death animation
+    void OnDeath();
 };

@@ -46,17 +46,9 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
 
     // Health could not be less than 0, if damage is too big
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    UE_LOG(LogHealthComponent, Display, TEXT("Damage: %f"), Damage)
 
-    if (DamageType)
+    if (!IsAlive())
     {
-        if (DamageType->IsA<UCphFireDamageType>())
-        {
-            UE_LOG(LogHealthComponent, Display, TEXT("I am in fire!"))
-        }
-        else if (DamageType->IsA<UCphIceDamageType>())
-        {
-            UE_LOG(LogHealthComponent, Display, TEXT("It's so cold here"))
-        }
+        OnDeath.Broadcast();
     }
 }

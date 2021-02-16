@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "CphHealthComponent.generated.h"
 
+// Delegate for telling player about his death
+DECLARE_MULTICAST_DELEGATE(FOnDeath)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPLUSHELL_API UCphHealthComponent final : public UActorComponent
@@ -21,6 +23,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     bool IsAlive() const { return Health > 0.0f; }
+
+    // Death delegate declaration
+    FOnDeath OnDeath;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health",

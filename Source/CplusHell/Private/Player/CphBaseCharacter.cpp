@@ -9,6 +9,8 @@
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
+
 // Sets default values
 ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
     : Super(
@@ -51,6 +53,8 @@ void ACphBaseCharacter::BeginPlay()
     // Checking for null only in debug and development mode
     check(HealthComponent)
     check(HealthTextComponent)
+
+    HealthComponent->OnDeath.AddUObject(this, &ACphBaseCharacter::OnDeath);
 }
 
 // Called every frame
@@ -149,4 +153,11 @@ void ACphBaseCharacter::OnStartSprinting()
 void ACphBaseCharacter::OnStopSprinting()
 {
     IsReadyToSprint = false;
+}
+
+// For playing death animation
+void ACphBaseCharacter::OnDeath()
+{
+    UE_LOG(LogBaseCharacter, Display, TEXT("Oh no, player %s is dead"),
+           *GetName())
 }
