@@ -43,17 +43,20 @@ protected:
 
     // Time interval of healing in seconds
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
-        meta = (ClampMin = "0.1", ClampMax = "60.0"))
+        meta = (ClampMin = "0.1", ClampMax = "60.0",
+            EditCondition = "AutoHeal"))
     float HealUpdateTime = 1.0f;
 
     // Time delay in second after which heal starts
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
-        meta = (ClampMin = "0.1", ClampMax = "60.0"))
+        meta = (ClampMin = "0.1", ClampMax = "60.0",
+            EditCondition = "AutoHeal"))
     float HealDelay = 3.0f;
 
     // Heal delta 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
-        meta = (ClampMin = "0.01", ClampMax = "1000.0"))
+        meta = (ClampMin = "0.01", ClampMax = "1000.0",
+            EditCondition = "AutoHeal"))
     float HealModifier = 5.0f;
 
     // Called when the game starts
