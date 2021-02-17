@@ -53,19 +53,20 @@ void ACphBaseCharacter::BeginPlay()
     // Checking for null only in debug and development mode
     check(HealthComponent)
     check(HealthTextComponent)
+    check(GetCharacterMovement())
 
-    HealthComponent->OnDeath.AddUObject(this, &ACphBaseCharacter::OnDeath);
+    // Init health before delegate declaration
+    OnHealthChanged(HealthComponent->GetHealth());
+    HealthComponent->OnDeath
+                   .AddUObject(this, &ACphBaseCharacter::OnDeath); 
+    HealthComponent->OnHealthChanged
+                   .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
 }
 
 // Called every frame
 void ACphBaseCharacter::Tick(float const DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    // Display health number
-    const float Health = HealthComponent->GetHealth();
-    HealthTextComponent->SetText(
-        FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
 
 // Called to bind functionality to input
@@ -155,9 +156,28 @@ void ACphBaseCharacter::OnStopSprinting()
     IsReadyToSprint = false;
 }
 
-// For playing death animation
+// Event for playing death animation
 void ACphBaseCharacter::OnDeath()
 {
     UE_LOG(LogBaseCharacter, Display, TEXT("Oh no, player %s is dead"),
            *GetName())
+    // Play animation montage
+    PlayAnimMontage(DeathAminMontage);
+    // Player can not move after death
+    GetCharacterMovement()->DisableMovement();
+    // Span after some seconds
+    SetLifeSpan(5.0f);
+    // Turn on spectator
+    if (Controller)
+    {
+        Controller->ChangeState(NAME_Spectating);
+    }
+}
+
+// Health changed event
+void ACphBaseCharacter::OnHealthChanged(const float Health) const
+{
+    // Display health number
+    HealthTextComponent->SetText(
+        FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }

@@ -8,6 +8,8 @@
 
 // Delegate for telling player about his death
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
+// Call on heath change then player can print health on event but every tick
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPLUSHELL_API UCphHealthComponent final : public UActorComponent
@@ -24,8 +26,9 @@ public:
     UFUNCTION(BlueprintCallable)
     bool IsAlive() const { return Health > 0.0f; }
 
-    // Death delegate declaration
+    // Delegates declaration
     FOnDeath OnDeath;
+    FOnHealthChanged OnHealthChanged;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health",

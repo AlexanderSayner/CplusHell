@@ -3,9 +3,6 @@
 
 #include "Components/CphHealthComponent.h"
 
-#include "Dev/CphFireDamageType.h"
-#include "Dev/CphIceDamageType.h"
-
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
 
 // Sets default values for this component's properties
@@ -25,6 +22,7 @@ void UCphHealthComponent::BeginPlay()
     Super::BeginPlay();
 
     Health = MaxHealth;
+    OnHealthChanged.Broadcast(Health);
 
     AActor* ComponentOwner = GetOwner();
     if (ComponentOwner)
@@ -46,6 +44,7 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
 
     // Health could not be less than 0, if damage is too big
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    OnHealthChanged.Broadcast(Health);
 
     if (!IsAlive())
     {

@@ -39,6 +39,10 @@ protected:
     // For display health number
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UTextRenderComponent* HealthTextComponent;
+    // Play death animation
+    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UAnimMontage* DeathAminMontage;
+
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
@@ -73,6 +77,8 @@ private:
     void OnStartSprinting();
     // Released acceleration key
     void OnStopSprinting();
-    // For playing death animation
+    // Event for playing death animation
     void OnDeath();
+    // Health changed event
+    void OnHealthChanged(float Health) const;
 };
