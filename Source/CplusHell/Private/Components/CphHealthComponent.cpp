@@ -3,8 +3,6 @@
 
 #include "Components/CphHealthComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
-
 // Sets default values for this component's properties
 UCphHealthComponent::UCphHealthComponent()
 {
@@ -21,8 +19,7 @@ void UCphHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    Health = MaxHealth;
-    OnHealthChanged.Broadcast(Health);
+    SetHealth(MaxHealth);
 
     AActor* ComponentOwner = GetOwner();
     if (ComponentOwner)
@@ -32,6 +29,16 @@ void UCphHealthComponent::BeginPlay()
     }
 }
 
+// Set and translate to delegate
+void UCphHealthComponent::SetHealth(const float NewHealth)
+{
+    // Health could not be less than 0 and more than available, if damage or heal is too big
+    Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
+    // Print health changing
+    OnHealthChanged.Broadcast(Health);
+}
+
+// Deals damage and starts healing
 void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
                                           const float Damage,
                                           const UDamageType* DamageType,
@@ -42,12 +49,37 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
     if (Damage <= 0.0f || !IsAlive())
         return;
 
-    // Health could not be less than 0, if damage is too big
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    OnHealthChanged.Broadcast(Health);
+    SetHealth(Health - Damage);
 
     if (!IsAlive())
     {
         OnDeath.Broadcast();
+        // Stop healing
+        if(GetWorld())
+        {
+            GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
+        }
+    }
+    else if (AutoHeal)
+    {
+        // Start doing auto heal
+        GetWorld()->GetTimerManager().SetTimer(HealTimerHandle,
+                                               this,
+                                               &UCphHealthComponent::HealUpdate,
+                                               HealUpdateTime,
+                                               true,
+                                               HealDelay);
+    }
+}
+
+// Updates health on Heal Modifier delta and stops timer then necessary 
+void UCphHealthComponent::HealUpdate()
+{
+    SetHealth(Health + HealModifier);
+    // Stop healing then already healed
+    if (FMath::IsNearlyEqual(Health, MaxHealth, 0.05f)
+        && GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
     }
 }
