@@ -11,6 +11,7 @@ Russian language is coming soon...
 1. [Game made on Unreal Engine 4](#game-made-on-unreal-engine-4)
 2. [Clone repository with HTTP](#clone-repository-with-http)
 3. [For developers](#for-developers)
+4. [Code conventions](#code-conventions)
 
 #### Game made on Unreal Engine 4
 [Table of contents](#Table-of-contents)
@@ -32,7 +33,7 @@ Fot editing sources in your IDE, double click on CplusHell.sln file.
 
 In Editor you can change default IDE for Unreal Engine. Click Edit -> Editor Preferences -> Source Code -> chose your favourite IDE in Source Code Editor option. 
 
-#### For developers
+#### For developer launch
 [Table of contents](#Table-of-contents)
 
 First of all, install MC Visual Studio Community 2019 for Unreal Engine. Then open the solution on directory root. Starting debug splution initialise opening Unreal Engine 4 editor.
@@ -44,3 +45,13 @@ Debug -> Attach to Process... -> start filter with "edit" -> attach unreal engin
 Then VS should start debug process.
 
 Also you can use another IDE that you like.    
+
+#### Code conventions
+[Table of contents](#Table-of-contents)
+
+Declaration rules
+* Constructor
+* Delegates
+* UFUNCTION
+* Casual functions
+

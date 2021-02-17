@@ -42,7 +42,15 @@ protected:
     // Play death animation
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* DeathAminMontage;
-
+    //
+    UPROPERTY(EditDefaultsOnly, Category = "Damage")
+    float LifeSpanOnDeath = 6.0f;
+    // Landed force interval when damage is dealt 
+    UPROPERTY(EditDefaultsOnly, Category = "Damage")
+    FVector2D LandedDamageVelocity = FVector2D(550.0f, 1250.0f);
+    // Landed damage interval
+    UPROPERTY(EditDefaultsOnly, Category = "Damage")
+    FVector2D LandedDamage = FVector2D(1, 10000);
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
@@ -81,4 +89,7 @@ private:
     void OnDeath();
     // Health changed event
     void OnHealthChanged(float Health) const;
+    // Subscription for landing delegate
+    UFUNCTION()
+    void OnGroundLanded(const FHitResult& Hit);
 };

@@ -58,9 +58,11 @@ void ACphBaseCharacter::BeginPlay()
     // Init health before delegate declaration
     OnHealthChanged(HealthComponent->GetHealth());
     HealthComponent->OnDeath
-                   .AddUObject(this, &ACphBaseCharacter::OnDeath); 
+                   .AddUObject(this, &ACphBaseCharacter::OnDeath);
     HealthComponent->OnHealthChanged
                    .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
+    // Subscribe for landing
+    LandedDelegate.AddDynamic(this, &ACphBaseCharacter::OnGroundLanded);
 }
 
 // Called every frame
@@ -74,6 +76,7 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
+    check(PlayerInputComponent)
 
     // MoveForward and MoveRight is mapped in unreal editor project preferences
     PlayerInputComponent->BindAxis("MoveForward", this,
@@ -166,7 +169,7 @@ void ACphBaseCharacter::OnDeath()
     // Player can not move after death
     GetCharacterMovement()->DisableMovement();
     // Span after some seconds
-    SetLifeSpan(5.0f);
+    SetLifeSpan(LifeSpanOnDeath);
     // Turn on spectator
     if (Controller)
     {
@@ -180,4 +183,21 @@ void ACphBaseCharacter::OnHealthChanged(const float Health) const
     // Display health number
     HealthTextComponent->SetText(
         FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
+// Subscription for landing delegate
+void ACphBaseCharacter::OnGroundLanded(const FHitResult& Hit)
+{
+    // Always negative when fall
+    const float FallVelocityZ = -GetVelocity().Z;
+    UE_LOG(LogBaseCharacter, Display, TEXT("On landed: %f"), FallVelocityZ)
+
+    // If fall speed is not too big then no damage
+    if (FallVelocityZ < LandedDamageVelocity.X) return;
+    // Proportional damage calculation
+    const float FinalDamage = FMath::GetMappedRangeValueClamped(
+        LandedDamageVelocity, LandedDamage, FallVelocityZ);
+    UE_LOG(LogBaseCharacter, Display, TEXT("Damage dealed: %f"), FinalDamage)
+    // Character deal damage itself
+    TakeDamage(FinalDamage, FDamageEvent{}, GetController(), this);
 }

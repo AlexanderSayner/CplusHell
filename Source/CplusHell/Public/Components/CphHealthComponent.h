@@ -7,10 +7,13 @@
 #include "CphHealthComponent.generated.h"
 
 // Delegate for telling player about his death
-DECLARE_MULTICAST_DELEGATE(FOnDeath)
+DECLARE_MULTICAST_DELEGATE(FOnDeathSignature)
 // Call on heath change then player can print health on event but every tick
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float)
 
+/**
+ * Healing and damage dealing politics
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPLUSHELL_API UCphHealthComponent final : public UActorComponent
 {
@@ -20,16 +23,16 @@ public:
     // Sets default values for this component's properties
     UCphHealthComponent();
 
-    // Getter
-    float GetHealth() const { return Health; }
+    // Delegates declaration
+    FOnDeathSignature OnDeath;
+    FOnHealthChangedSignature OnHealthChanged;
 
     // Set health uses clamp, so health will never be much less than zero 
-    UFUNCTION(BlueprintCallable)
-    bool IsAlive() const { return !FMath::IsNearlyZero(Health); }
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    bool IsAlive() const { return !FMath::IsNearlyZero(Health, 0.5f); }
 
-    // Delegates declaration
-    FOnDeath OnDeath;
-    FOnHealthChanged OnHealthChanged;
+    // Getter
+    float GetHealth() const { return Health; }
 
 protected:
     // Setting for max health
