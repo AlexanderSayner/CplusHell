@@ -19,7 +19,7 @@ UCphWeaponComponent::UCphWeaponComponent()
 // Fire on action. Can not be const, because of using in BindAction
 void UCphWeaponComponent::Fire()
 {
-    if(CurrentWeapon)
+    if (CurrentWeapon)
     {
         CurrentWeapon->Fire();
     }
@@ -53,6 +53,8 @@ void UCphWeaponComponent::SpawnWeapon()
                 // GetMesh() returns character's skeleton mesh component
                 CurrentWeapon->AttachToComponent(Character->GetMesh(), Rules,
                                                  WeaponAttachPointName);
+                // Set owner for access his camera for shooting direction
+                CurrentWeapon->SetOwner(Character);
             }
         }
     }
