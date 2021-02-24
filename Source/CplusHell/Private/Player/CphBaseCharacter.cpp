@@ -8,7 +8,7 @@
 #include "Components/CphHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Weapon/CphBaseWeapon.h"
+#include "Components/CphWeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
@@ -48,6 +48,10 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
     HealthTextComponent->SetupAttachment(GetRootComponent());
     // See only other players health 
     HealthTextComponent->SetOwnerNoSee(true);
+
+    // Weapon is just logical component
+    WeaponComponent = CreateDefaultSubobject<UCphWeaponComponent>(
+        "WeaponComponent");
 }
 
 // Called when the game starts or when spawned
@@ -68,9 +72,6 @@ void ACphBaseCharacter::BeginPlay()
                    .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
     // Subscribe for landing
     LandedDelegate.AddDynamic(this, &ACphBaseCharacter::OnGroundLanded);
-
-    // Spawning weapon
-    SpawnWeapon();
 }
 
 // Called every frame
@@ -85,6 +86,7 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
     check(PlayerInputComponent)
+    check(WeaponComponent)
 
     // MoveForward and MoveRight is mapped in unreal editor project preferences
     PlayerInputComponent->BindAxis("MoveForward", this,
@@ -109,6 +111,10 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
                                      &ACphBaseCharacter::OnStartSprinting);
     PlayerInputComponent->BindAction("Sprint", IE_Released, this,
                                      &ACphBaseCharacter::OnStopSprinting);
+
+    // Fire
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent,
+                                     &UCphWeaponComponent::Fire);
 }
 
 // Tell for blueprint, if character is sprinting
@@ -208,23 +214,4 @@ void ACphBaseCharacter::OnGroundLanded(const FHitResult& Hit)
     UE_LOG(LogBaseCharacter, Display, TEXT("Damage dealed: %f"), FinalDamage)
     // Character deal damage itself
     TakeDamage(FinalDamage, FDamageEvent{}, GetController(), this);
-}
-
-// Spawn weapon on level (setting in skeleton mesh)
-void ACphBaseCharacter::SpawnWeapon() const
-{
-    // Actor spawn on world
-    if (GetWorld())
-    {
-        const auto Weapon =
-            GetWorld()->SpawnActor<ACphBaseWeapon>(WeaponClass);
-        // Connect spawned weapon to mesh
-        if (Weapon)
-        {
-            const FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget,
-                                                  false);
-            // GetMesh() returns character's skeleton mesh component
-            Weapon->AttachToComponent(GetMesh(), Rules, "WeaponPoint");
-        }
-    }
 }

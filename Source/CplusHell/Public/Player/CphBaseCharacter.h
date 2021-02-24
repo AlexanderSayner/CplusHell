@@ -12,7 +12,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UCphHealthComponent;
 class UTextRenderComponent;
-class ACphBaseWeapon;
+class UCphWeaponComponent;
 
 /*
  * My main awesome character
@@ -40,6 +40,9 @@ protected:
     // For display health number
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UTextRenderComponent* HealthTextComponent;
+    //
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UCphWeaponComponent* WeaponComponent;
     // Play death animation
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* DeathAminMontage;
@@ -52,9 +55,6 @@ protected:
     // Landed damage interval
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(1, 10000);
-    // Custom weapon class
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TSubclassOf<ACphBaseWeapon> WeaponClass;
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
@@ -96,6 +96,4 @@ private:
     // Subscription for landing delegate
     UFUNCTION()
     void OnGroundLanded(const FHitResult& Hit);
-    // Spawn weapon on level (setting in skeleton mesh)
-    void SpawnWeapon() const;
 };

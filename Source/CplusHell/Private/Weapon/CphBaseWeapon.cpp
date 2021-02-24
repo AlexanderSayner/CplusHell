@@ -3,6 +3,8 @@
 
 #include "Weapon/CphBaseWeapon.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All)
+
 // Sets default values
 ACphBaseWeapon::ACphBaseWeapon()
 {
@@ -11,6 +13,12 @@ ACphBaseWeapon::ACphBaseWeapon()
 
     WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
     SetRootComponent(WeaponMesh);
+}
+
+//
+void ACphBaseWeapon::Fire()
+{
+    UE_LOG(LogBaseWeapon, Display, TEXT("Fires"))
 }
 
 // Called when the game starts or when spawned
