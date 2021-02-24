@@ -37,49 +37,81 @@ void ACphBaseWeapon::MakeShot() const
 {
     if (!GetWorld()) return;
 
+    FVector TraceStart, TraceEnd;
+    if (!GetTraceData(TraceStart, TraceEnd)) return;
+
+    FHitResult HitResult;
+    MakeHit(HitResult, TraceStart, TraceEnd);
+
+    // If got
+    if (HitResult.bBlockingHit)
+    {
+        DrawDebugLine(GetWorld(),
+                      GetMuzzleWorldLocation(),
+                      HitResult.ImpactPoint,
+                      FColor::Red, false, 3.0f, 0, 3.0f);
+        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
+                        FColor::Red, false, 5.0f);
+    }
+    else
+    {
+        DrawDebugLine(GetWorld(),
+                      GetMuzzleWorldLocation(), TraceEnd,
+                      FColor::Green, false, 3.0f, 0, 3.0f);
+    }
+}
+
+// Returns nullptr if fails
+APlayerController* ACphBaseWeapon::GetPlayerController() const
+{
     const auto Player = Cast<ACharacter>(GetOwner());
-    if (!Player) return;
+    if (!Player) return nullptr;
 
-    const auto Controller = Player->GetController<APlayerController>();
-    if (!Controller) return;
+    return Player->GetController<APlayerController>();
+}
 
+// Returns false on fail
+bool ACphBaseWeapon::GetPlayerViewPoint(FVector& ViewLocation,
+                                        FRotator& ViewRotation) const
+{
+    const APlayerController* Controller = GetPlayerController();
+    if (!Controller) return false;
+
+    Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    return true;
+}
+
+// 3d Vector of the muzzle
+FVector ACphBaseWeapon::GetMuzzleWorldLocation() const
+{
+    return WeaponMesh->GetSocketLocation(MuzzleSocketName);
+}
+
+// Shot trace
+bool ACphBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+{
     FVector ViewLocation;
     FRotator ViewRotation;
-    Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    if (!GetPlayerViewPoint(ViewLocation, ViewRotation)) return false;
 
     // Draw direction line
-    const FTransform SocketTransform = WeaponMesh->GetSocketTransform(
-        MuzzleSocketName);
-    const FVector TraceStart = ViewLocation;
+    TraceStart = ViewLocation;
     const FVector ShootDirection = ViewRotation.Vector();
-    const FVector TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    return true;
+}
+
+// Find interception of shot
+void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
+                             const FVector& TraceEnd) const
+{
+    if (!GetWorld()) return;
 
     // Ignore player itself
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(GetOwner());
 
     // Draw interception sphere
-    FHitResult HitResult;
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,
                                          ECC_Visibility, CollisionParams);
-
-    // If got
-    if (HitResult.bBlockingHit)
-    {
-        DrawDebugLine(GetWorld(),
-                      SocketTransform.GetLocation(),
-                      HitResult.ImpactPoint,
-                      FColor::Red, false, 3.0f, 0, 3.0f);
-        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
-                        FColor::Red, false, 5.0f);
-
-        UE_LOG(LogBaseWeapon, Display, TEXT("Bone: %s"),
-               *HitResult.BoneName.ToString())
-    }
-    else
-    {
-        DrawDebugLine(GetWorld(),
-                      SocketTransform.GetLocation(), TraceEnd,
-                      FColor::Green, false, 3.0f, 0, 3.0f);
-    }
 }

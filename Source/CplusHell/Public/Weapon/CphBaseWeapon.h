@@ -35,4 +35,18 @@ protected:
 
     // Shot where look
     void MakeShot() const;
+
+private:
+    // Returns nullptr if fails
+    APlayerController* GetPlayerController() const;
+    // Returns false on fail
+    bool GetPlayerViewPoint(FVector& ViewLocation,
+                            FRotator& ViewRotation) const;
+    // 3d Vector of the muzzle
+    FVector GetMuzzleWorldLocation() const;
+    // Shot trace
+    bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+    // Find interception of shot
+    void MakeHit(FHitResult& HitResult,
+                 const FVector& TraceStart, const FVector& TraceEnd) const;
 };
