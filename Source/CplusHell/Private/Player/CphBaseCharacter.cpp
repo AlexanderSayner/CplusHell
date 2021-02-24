@@ -29,6 +29,8 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
     /* For looking up and down set Use Pawn Control Rotation true in camera component
     * also it can be set up in details window in Base Character blueprint if you wish */
     SpringArmComponent->bUsePawnControlRotation = true;
+    // Camera angle
+    SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 70.0f);
 
     // Creating player eyes
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(
@@ -44,6 +46,8 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
     HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>(
         "HealthTextComponent");
     HealthTextComponent->SetupAttachment(GetRootComponent());
+    // See only other players health 
+    HealthTextComponent->SetOwnerNoSee(true);
 }
 
 // Called when the game starts or when spawned
