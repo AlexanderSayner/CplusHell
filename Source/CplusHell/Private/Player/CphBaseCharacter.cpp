@@ -8,6 +8,7 @@
 #include "Components/CphHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapon/CphBaseWeapon.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
@@ -63,6 +64,9 @@ void ACphBaseCharacter::BeginPlay()
                    .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
     // Subscribe for landing
     LandedDelegate.AddDynamic(this, &ACphBaseCharacter::OnGroundLanded);
+
+    // Spawning weapon
+    SpawnWeapon();
 }
 
 // Called every frame
@@ -200,4 +204,23 @@ void ACphBaseCharacter::OnGroundLanded(const FHitResult& Hit)
     UE_LOG(LogBaseCharacter, Display, TEXT("Damage dealed: %f"), FinalDamage)
     // Character deal damage itself
     TakeDamage(FinalDamage, FDamageEvent{}, GetController(), this);
+}
+
+// Spawn weapon on level (setting in skeleton mesh)
+void ACphBaseCharacter::SpawnWeapon() const
+{
+    // Actor spawn on world
+    if (GetWorld())
+    {
+        const auto Weapon =
+            GetWorld()->SpawnActor<ACphBaseWeapon>(WeaponClass);
+        // Connect spawned weapon to mesh
+        if (Weapon)
+        {
+            const FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget,
+                                                  false);
+            // GetMesh() returns character's skeleton mesh component
+            Weapon->AttachToComponent(GetMesh(), Rules, "WeaponPoint");
+        }
+    }
 }
