@@ -7,8 +7,6 @@
 #include "GameFramework/Character.h"
 #include "Player/CphBaseCharacter.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All)
-
 // Sets default values
 ACphBaseWeapon::ACphBaseWeapon()
 {
@@ -22,7 +20,16 @@ ACphBaseWeapon::ACphBaseWeapon()
 //
 void ACphBaseWeapon::Fire()
 {
-    MakeShot();
+}
+
+//
+void ACphBaseWeapon::StopFire()
+{
+}
+
+//
+void ACphBaseWeapon::MakeShot()
+{
 }
 
 // Called when the game starts or when spawned
@@ -31,36 +38,6 @@ void ACphBaseWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(WeaponMesh)
-}
-
-// Shot where look
-void ACphBaseWeapon::MakeShot() const
-{
-    if (!GetWorld()) return;
-
-    FVector TraceStart, TraceEnd;
-    if (!GetTraceData(TraceStart, TraceEnd)) return;
-
-    FHitResult HitResult;
-    MakeHit(HitResult, TraceStart, TraceEnd);
-
-    // If got
-    if (HitResult.bBlockingHit)
-    {
-        DrawDebugLine(GetWorld(),
-                      GetMuzzleWorldLocation(),
-                      HitResult.ImpactPoint,
-                      FColor::Red, false, 3.0f, 0, 3.0f);
-        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
-                        FColor::Red, false, 5.0f);
-        MakeDamage(HitResult);
-    }
-    else
-    {
-        DrawDebugLine(GetWorld(),
-                      GetMuzzleWorldLocation(), TraceEnd,
-                      FColor::Green, false, 3.0f, 0, 3.0f);
-    }
 }
 
 // Returns nullptr if fails
@@ -116,13 +93,4 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
     // Draw interception sphere
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,
                                          ECC_Visibility, CollisionParams);
-}
-
-// Deal damage to hit actor
-void ACphBaseWeapon::MakeDamage(const FHitResult& HitResult) const
-{
-    AActor* DamagedActor = HitResult.GetActor();
-    if (!DamagedActor) return;
-    DamagedActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(),
-                             GetPlayerController()->GetCharacter());
 }

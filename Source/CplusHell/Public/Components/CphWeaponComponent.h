@@ -18,6 +18,8 @@ public:
     UCphWeaponComponent();
     // Fire on action. Can not be const, because of using in BindAction
     void Fire();
+    // On mouse button release. Can not be const, because of using in BindAction
+    void StopFire();
 
 protected:
     // Custom weapon class

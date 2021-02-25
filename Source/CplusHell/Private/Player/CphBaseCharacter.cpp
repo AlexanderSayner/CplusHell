@@ -99,6 +99,8 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     // Fire
     PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent,
                                      &UCphWeaponComponent::Fire);
+    PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent,
+                                     &UCphWeaponComponent::StopFire);
 }
 
 // Tell for blueprint, if character is sprinting
@@ -175,6 +177,8 @@ void ACphBaseCharacter::OnDeath()
     }
     // Turn off collision
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    // Stop firing
+    WeaponComponent->StopFire();
 }
 
 // Health changed event

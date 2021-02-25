@@ -8,8 +8,11 @@
 
 class USkeletalMeshComponent;
 
+/**
+ * Utility logic for all weapons in the game
+ */
 UCLASS()
-class CPLUSHELL_API ACphBaseWeapon final : public AActor
+class CPLUSHELL_API ACphBaseWeapon : public AActor
 {
     GENERATED_BODY()
 
@@ -17,29 +20,30 @@ public:
     // Sets default values for this actor's properties
     ACphBaseWeapon();
     //
-    void Fire();
+    virtual void Fire();
+    //
+    virtual void StopFire();
 
 protected:
     // Weapon mesh
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent* WeaponMesh;
     //
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName MuzzleSocketName = "MuzzleFlashSocket";
     //
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float TraceMaxDistance = 3000.0f;
-    // Damage amount of weapon mesh
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-    float DamageAmount = 10.0f;
 
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
     // Shot where look
-    void MakeShot() const;
+    virtual void MakeShot();
 
-private:
+    // Shot trace
+    virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+
     // Returns nullptr if fails
     APlayerController* GetPlayerController() const;
     // Returns false on fail
@@ -47,12 +51,7 @@ private:
                             FRotator& ViewRotation) const;
     // 3d Vector of the muzzle
     FVector GetMuzzleWorldLocation() const;
-    // Shot trace
-    bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
     // Find interception of shot
     void MakeHit(FHitResult& HitResult,
                  const FVector& TraceStart, const FVector& TraceEnd) const;
-    // Deal damage to hit actor
-    UFUNCTION()
-    void MakeDamage(const FHitResult& HitResult) const;
 };

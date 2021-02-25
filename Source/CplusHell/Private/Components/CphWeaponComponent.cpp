@@ -25,6 +25,15 @@ void UCphWeaponComponent::Fire()
     }
 }
 
+// On mouse button release. Can not be const, because of using in BindAction
+void UCphWeaponComponent::StopFire()
+{
+    if (CurrentWeapon)
+    {
+        CurrentWeapon->StopFire();
+    }
+}
+
 
 // Called when the game starts
 void UCphWeaponComponent::BeginPlay()
