@@ -5,6 +5,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Character.h"
+#include "Player/CphBaseCharacter.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All)
 
@@ -52,6 +53,7 @@ void ACphBaseWeapon::MakeShot() const
                       FColor::Red, false, 3.0f, 0, 3.0f);
         DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
                         FColor::Red, false, 5.0f);
+        MakeDamage(HitResult);
     }
     else
     {
@@ -114,4 +116,13 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
     // Draw interception sphere
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,
                                          ECC_Visibility, CollisionParams);
+}
+
+// Deal damage to hit actor
+void ACphBaseWeapon::MakeDamage(const FHitResult& HitResult) const
+{
+    AActor* DamagedActor = HitResult.GetActor();
+    if (!DamagedActor) return;
+    DamagedActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(),
+                             GetPlayerController()->GetCharacter());
 }

@@ -4,6 +4,7 @@
 #include "Player/CphBaseCharacter.h"
 
 
+#include "Components/CapsuleComponent.h"
 #include "Components/CphCharacterMovementComponent.h"
 #include "Components/CphHealthComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -20,23 +21,6 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-
-    // Attach SpringArm to root Actor's component using GetRootComponent function
-    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(
-        "SpringArmComponent");
-    // Set parent root component
-    SpringArmComponent->SetupAttachment(GetRootComponent());
-    /* For looking up and down set Use Pawn Control Rotation true in camera component
-    * also it can be set up in details window in Base Character blueprint if you wish */
-    SpringArmComponent->bUsePawnControlRotation = true;
-    // Camera angle
-    SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 70.0f);
-
-    // Creating player eyes
-    CameraComponent = CreateDefaultSubobject<UCameraComponent>(
-        "CameraComponent");
-    // Attach camera to SpringArm
-    CameraComponent->SetupAttachment(SpringArmComponent);
 
     // For logical components no need to SetupAttachment
     HealthComponent = CreateDefaultSubobject<UCphHealthComponent>(
@@ -189,6 +173,8 @@ void ACphBaseCharacter::OnDeath()
     {
         Controller->ChangeState(NAME_Spectating);
     }
+    // Turn off collision
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 // Health changed event

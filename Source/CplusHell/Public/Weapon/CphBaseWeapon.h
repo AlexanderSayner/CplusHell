@@ -9,7 +9,7 @@
 class USkeletalMeshComponent;
 
 UCLASS()
-class CPLUSHELL_API ACphBaseWeapon : public AActor
+class CPLUSHELL_API ACphBaseWeapon final : public AActor
 {
     GENERATED_BODY()
 
@@ -17,7 +17,7 @@ public:
     // Sets default values for this actor's properties
     ACphBaseWeapon();
     //
-    virtual void Fire();
+    void Fire();
 
 protected:
     // Weapon mesh
@@ -29,6 +29,9 @@ protected:
     //
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     float TraceMaxDistance = 3000.0f;
+    // Damage amount of weapon mesh
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    float DamageAmount = 10.0f;
 
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -49,4 +52,7 @@ private:
     // Find interception of shot
     void MakeHit(FHitResult& HitResult,
                  const FVector& TraceStart, const FVector& TraceEnd) const;
+    // Deal damage to hit actor
+    UFUNCTION()
+    void MakeDamage(const FHitResult& HitResult) const;
 };
