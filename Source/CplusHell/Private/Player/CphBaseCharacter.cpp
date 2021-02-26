@@ -101,6 +101,10 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
                                      &UCphWeaponComponent::Fire);
     PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent,
                                      &UCphWeaponComponent::StopFire);
+
+    // Weapon choosing circle
+    PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, WeaponComponent,
+                                     &UCphWeaponComponent::NextWeapon);
 }
 
 // Tell for blueprint, if character is sprinting
