@@ -8,6 +8,18 @@
 
 class ACphBaseWeapon;
 
+USTRUCT(BlueprintType)
+struct FWeaponData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
+    TSubclassOf<ACphBaseWeapon> WeaponClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
+    UAnimMontage* ReloadAnimMontage;
+};
+
 /**
  * Ability for weapon changing
  */
@@ -27,17 +39,23 @@ public:
     void StopFire();
     // Circle choosing weapon
     void NextWeapon();
+    // Reload action mapping
+    void Reload();
 
 protected:
     // Custom weapon class
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TArray<TSubclassOf<ACphBaseWeapon>> WeaponClasses;
+    // TArray<TSubclassOf<ACphBaseWeapon>> WeaponClasses;
+    TArray<FWeaponData> WeaponData;
     // Right hand socket
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponEquipSocketName = "WeaponPoint";
     // Addition weapon socket
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponArmorySocketName = "ArmorySocket";
+    // Weapon component field in BP_PlayerCharacter
+    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UAnimMontage* EquipAnimMontage;
 
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -51,11 +69,16 @@ private:
     UPROPERTY()
     TArray<ACphBaseWeapon*> Weapons;
 
+    // Different weapons - different animation
+    UPROPERTY()
+    UAnimMontage* CurrentReloadAnimMontage = nullptr;
+
     // Default weapon in game begin 
     int32 CurrentWeaponIndex = 0;
+    bool EquipAnimInProgress = false;
+    bool ReloadAnimInProgress = false;
 
-
-    // Logger
+    // Console logger
     static void LogWarning(FString Reason);
     // Taking in hands or taking off
     static void AttachWeaponToSocket(ACphBaseWeapon* Weapon,
@@ -65,4 +88,43 @@ private:
     void EquipWeapon(int32 WeaponIndex);
     // Initialisation
     void SpawnWeapons();
+
+    //
+    void PlayAnimMontage(UAnimMontage* Animation) const;
+    // Subscribe for Anim Notify
+    void InitAnimations();
+    // Could not be static because of using in delegate callback
+    void OnEquipFinished(USkeletalMeshComponent* MeshComponent);
+    void OnReloadFinished(USkeletalMeshComponent* MeshComponent);
+
+    // Solution for non stop weapon changing
+    bool CanFire() const;
+    bool CanEquip() const;
+    bool CanReload() const;
+
+    //
+    template <typename T>
+    T* FindFirstNotifyByClass(UAnimSequenceBase* Animation);
 };
+
+/**
+ * Cycle for all notifiers in amin montage
+ */
+template <typename T>
+T* UCphWeaponComponent::FindFirstNotifyByClass(UAnimSequenceBase* Animation)
+{
+    if (!Animation) return nullptr;
+
+    const TArray<struct FAnimNotifyEvent> Notifies = Animation->
+        Notifies;
+
+    for (const FAnimNotifyEvent NotifyEvent : Notifies)
+    {
+        T* AnimNotify = Cast<T>(NotifyEvent.Notify);
+        if (AnimNotify)
+        {
+            return AnimNotify;
+        }
+    }
+    return nullptr;
+}

@@ -2,7 +2,8 @@
 
 
 #include "Components/CphWeaponComponent.h"
-
+#include "Animations/CphEquipFinishedAnimNotify.h"
+#include "Animations/CphReloadFinishedAnimNotify.h"
 #include "GameFramework/Character.h"
 #include "Weapon/CphBaseWeapon.h"
 
@@ -21,7 +22,7 @@ UCphWeaponComponent::UCphWeaponComponent()
 // Destroy player weapons
 void UCphWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    CurrentWeapon=nullptr;
+    CurrentWeapon = nullptr;
     for (ACphBaseWeapon* Weapon : Weapons)
     {
         Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -34,7 +35,7 @@ void UCphWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 // Fire on action. Can not be const, because of using in BindAction
 void UCphWeaponComponent::Fire()
 {
-    if (CurrentWeapon)
+    if (CanFire())
     {
         CurrentWeapon->Fire();
     }
@@ -52,9 +53,19 @@ void UCphWeaponComponent::StopFire()
 // Circle choosing weapon
 void UCphWeaponComponent::NextWeapon()
 {
+    if (!CanEquip()) return;
     // The remainder of the division by the length of the array
     CurrentWeaponIndex = (CurrentWeaponIndex + 1) % Weapons.Num();
     EquipWeapon(CurrentWeaponIndex);
+}
+
+// Reload action mapping
+void UCphWeaponComponent::Reload()
+{
+    if (!CanReload()) return;
+    StopFire();
+    ReloadAnimInProgress = true;
+    PlayAnimMontage(CurrentReloadAnimMontage);
 }
 
 
@@ -66,6 +77,13 @@ void UCphWeaponComponent::BeginPlay()
     SpawnWeapons();
     check(CurrentWeaponIndex==0)
     EquipWeapon(CurrentWeaponIndex);
+    InitAnimations();
+}
+
+// Logger
+void UCphWeaponComponent::LogWarning(const FString Reason)
+{
+    UE_LOG(LogCphWeaponComponent, Warning, TEXT("%s"), *Reason)
 }
 
 //
@@ -89,6 +107,12 @@ void UCphWeaponComponent::AttachWeaponToSocket(ACphBaseWeapon* Weapon,
 // Set Current weapon, attach to character's hand
 void UCphWeaponComponent::EquipWeapon(const int32 WeaponIndex)
 {
+    if (WeaponIndex < 0 || WeaponIndex >= Weapons.Num())
+    {
+        LogWarning(FString::Printf(TEXT("Invalid weapon index")));
+        return;
+    }
+
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character) return;
 
@@ -101,7 +125,20 @@ void UCphWeaponComponent::EquipWeapon(const int32 WeaponIndex)
 
     // Take weapon in hands
     CurrentWeapon = Weapons[WeaponIndex];
+    // CurrentReloadAnimMontage = WeaponData[WeaponIndex].ReloadAnimMontage;
+    const FWeaponData* CurrentWeaponData = WeaponData.FindByPredicate(
+        [&](const FWeaponData& Data)
+        {
+            return Data.WeaponClass == CurrentWeapon->GetClass();
+        });
+    CurrentReloadAnimMontage = CurrentWeaponData
+                                   ? CurrentWeaponData->ReloadAnimMontage
+                                   : nullptr;
+
     AttachWeaponToSocket(CurrentWeapon, Character, WeaponEquipSocketName);
+    EquipAnimInProgress = true;
+    // Play animation
+    PlayAnimMontage(EquipAnimMontage);
 }
 
 //
@@ -113,10 +150,10 @@ void UCphWeaponComponent::SpawnWeapons()
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character) return;
 
-    for (TSubclassOf<ACphBaseWeapon> WeaponClass : WeaponClasses)
+    for (FWeaponData OneWeaponData : WeaponData)
     {
         ACphBaseWeapon* Weapon =
-            GetWorld()->SpawnActor<ACphBaseWeapon>(WeaponClass);
+            GetWorld()->SpawnActor<ACphBaseWeapon>(OneWeaponData.WeaponClass);
 
         if (Weapon)
         {
@@ -133,8 +170,71 @@ void UCphWeaponComponent::SpawnWeapons()
     }
 }
 
-// Logger
-void UCphWeaponComponent::LogWarning(const FString Reason)
+//
+void UCphWeaponComponent::PlayAnimMontage(UAnimMontage* Animation) const
 {
-    UE_LOG(LogCphWeaponComponent, Warning, TEXT("%s"), *Reason)
+    ACharacter* Character = Cast<ACharacter>(GetOwner());
+    if (!Character) return;
+
+    Character->PlayAnimMontage(Animation);
+}
+
+// Subscribe for Anim Notify
+void UCphWeaponComponent::InitAnimations()
+{
+    UCphEquipFinishedAnimNotify* EquipFinishedAnimNotify =
+        FindFirstNotifyByClass<UCphEquipFinishedAnimNotify>(EquipAnimMontage);
+    if (EquipFinishedAnimNotify)
+    {
+        EquipFinishedAnimNotify->OnNotified.AddUObject(
+            this, &UCphWeaponComponent::OnEquipFinished);
+    }
+
+    for (FWeaponData Data : WeaponData)
+    {
+        UCphReloadFinishedAnimNotify* ReloadFinishedAnimNotify =
+            FindFirstNotifyByClass<UCphReloadFinishedAnimNotify>(
+                Data.ReloadAnimMontage);
+        if (ReloadFinishedAnimNotify)
+        {
+            ReloadFinishedAnimNotify->OnNotified.AddUObject(
+                this, &UCphWeaponComponent::OnReloadFinished);
+        }
+    }
+}
+
+// Could not be static because of using in delegate callback
+void UCphWeaponComponent::OnEquipFinished(USkeletalMeshComponent* MeshComponent)
+{
+    ACharacter* Character = Cast<ACharacter>(GetOwner());
+    if (!Character || Character->GetMesh() != MeshComponent) return;
+
+    EquipAnimInProgress = false;
+}
+
+//
+void UCphWeaponComponent::OnReloadFinished(
+    USkeletalMeshComponent* MeshComponent)
+{
+    ACharacter* Character = Cast<ACharacter>(GetOwner());
+    if (!Character || MeshComponent != Character->GetMesh()) return;
+    ReloadAnimInProgress = false;
+}
+
+//
+bool UCphWeaponComponent::CanFire() const
+{
+    return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress;
+}
+
+//
+bool UCphWeaponComponent::CanEquip() const
+{
+    return !EquipAnimInProgress && !ReloadAnimInProgress;
+}
+
+//
+bool UCphWeaponComponent::CanReload() const
+{
+    return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress;
 }

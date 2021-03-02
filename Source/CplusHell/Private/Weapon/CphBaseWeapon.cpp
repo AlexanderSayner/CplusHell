@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "Player/CphBaseCharacter.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogCphBaseWeapon, All, All)
+
 // Sets default values
 ACphBaseWeapon::ACphBaseWeapon()
 {
@@ -38,6 +40,7 @@ void ACphBaseWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(WeaponMesh)
+    CurrentAmmo = DefaultAmmo;
 }
 
 // Returns nullptr if fails
@@ -93,4 +96,44 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
     // Draw interception sphere
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,
                                          ECC_Visibility, CollisionParams);
+}
+
+void ACphBaseWeapon::DecreaseAmmo()
+{
+    CurrentAmmo.Bullets--;
+    LogAmmo();
+
+    if (IsClipEmpty() && !IsAmmoEmpty())
+    {
+        ChangeClip();
+    }
+}
+
+bool ACphBaseWeapon::IsAmmoEmpty() const
+{
+    return !CurrentAmmo.Infinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
+}
+
+bool ACphBaseWeapon::IsClipEmpty() const
+{
+    return CurrentAmmo.Bullets == 0;
+}
+
+void ACphBaseWeapon::ChangeClip()
+{
+    CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+    if (!CurrentAmmo.Infinite)
+    {
+        CurrentAmmo.Clips--;
+    }
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("Changed clip"))
+}
+
+void ACphBaseWeapon::LogAmmo()
+{
+    FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + "\n";
+    AmmoInfo += CurrentAmmo.Infinite
+                    ? "Infinite"
+                    : FString::FromInt(CurrentAmmo.Clips);
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("Ammunition Stats\n%s"), *AmmoInfo);
 }

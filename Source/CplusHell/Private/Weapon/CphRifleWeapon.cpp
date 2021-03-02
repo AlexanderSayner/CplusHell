@@ -19,10 +19,18 @@ void ACphRifleWeapon::StopFire()
 
 void ACphRifleWeapon::MakeShot()
 {
-    if (!GetWorld()) return;
+    if (!GetWorld() || IsAmmoEmpty())
+    {
+        StopFire();
+        return;
+    }
 
     FVector TraceStart, TraceEnd;
-    if (!GetTraceData(TraceStart, TraceEnd)) return;
+    if (!GetTraceData(TraceStart, TraceEnd))
+    {
+        StopFire();
+        return;
+    }
 
     FHitResult HitResult;
     MakeHit(HitResult, TraceStart, TraceEnd);
@@ -44,6 +52,8 @@ void ACphRifleWeapon::MakeShot()
                       GetMuzzleWorldLocation(), TraceEnd,
                       FColor::Green, false, 3.0f, 0, 3.0f);
     }
+
+    DecreaseAmmo();
 }
 
 bool ACphRifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const

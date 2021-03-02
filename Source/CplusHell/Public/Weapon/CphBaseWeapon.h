@@ -8,6 +8,22 @@
 
 class USkeletalMeshComponent;
 
+USTRUCT(BlueprintType)
+struct FAmmoData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    int32 Bullets; // Bullets count in weapon
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon",
+        meta = (EditCondition = "!Infinite"))
+    int32 Clips; // Bullets total
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    bool Infinite; // true - bullets are infinite, otherwise - false
+};
+
 /**
  * Utility logic for all weapons in the game
  */
@@ -29,11 +45,14 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent* WeaponMesh;
     //
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FName MuzzleSocketName = "MuzzleFlashSocket";
     //
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float TraceMaxDistance = 3000.0f;
+    //
+    UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Weapon")
+    FAmmoData DefaultAmmo{15, 10, false};
 
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -54,4 +73,14 @@ protected:
     // Find interception of shot
     void MakeHit(FHitResult& HitResult,
                  const FVector& TraceStart, const FVector& TraceEnd) const;
+    //
+    void DecreaseAmmo();
+    bool IsAmmoEmpty() const;
+    bool IsClipEmpty() const;
+    void ChangeClip();
+    void LogAmmo();
+
+private:
+    // Initialised in Begin Play
+    FAmmoData CurrentAmmo;
 };

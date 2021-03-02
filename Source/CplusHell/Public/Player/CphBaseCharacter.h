@@ -28,6 +28,12 @@ public:
     explicit ACphBaseCharacter(const FObjectInitializer& ObjInit);
 
 protected:
+    // Smart camera controller
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    USpringArmComponent* SpringArmComponent;
+    // Getting ful control on camera
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UCameraComponent* FollowCamera;
     // Allows to display health status above character
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCphHealthComponent* HealthComponent;

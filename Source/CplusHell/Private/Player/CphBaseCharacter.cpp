@@ -22,6 +22,23 @@ ACphBaseCharacter::ACphBaseCharacter(const FObjectInitializer& ObjInit)
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
+    // Attach SpringArm to root Actor's component using GetRootComponent function
+    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(
+        "CameraBoom");
+    // Set parent root component
+    SpringArmComponent->SetupAttachment(GetRootComponent());
+    /* For looking up and down set Use Pawn Control Rotation true in camera component
+    * also it can be set up in details window in Base Character blueprint if you wish */
+    SpringArmComponent->bUsePawnControlRotation = true;
+    // Camera angle
+    SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 70.0f);
+
+    // Creating player eyes
+    FollowCamera = CreateDefaultSubobject<UCameraComponent>(
+        "FollowCamera");
+    // Attach camera to SpringArm
+    FollowCamera->SetupAttachment(SpringArmComponent);
+
     // For logical components no need to SetupAttachment
     HealthComponent = CreateDefaultSubobject<UCphHealthComponent>(
         "HealthComponent");
@@ -105,6 +122,10 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
     // Weapon choosing circle
     PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, WeaponComponent,
                                      &UCphWeaponComponent::NextWeapon);
+
+    // Reload animation
+    PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent,
+                                     &UCphWeaponComponent::Reload);
 }
 
 // Tell for blueprint, if character is sprinting

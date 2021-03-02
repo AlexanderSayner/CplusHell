@@ -12,7 +12,7 @@ void ACphLauncherWeapon::Fire()
 
 void ACphLauncherWeapon::MakeShot()
 {
-    if (!GetWorld()) return;
+    if (!GetWorld() || IsAmmoEmpty()) return;
 
     FVector TraceStart, TraceEnd;
     if (!GetTraceData(TraceStart, TraceEnd)) return;
@@ -32,8 +32,12 @@ void ACphLauncherWeapon::MakeShot()
     ACphProjectile* Projectile = GetWorld()
         ->SpawnActorDeferred<ACphProjectile>(ProjectileClass, SpawnTransform);
 
-    if (!Projectile) return;
-    Projectile->SetShotDirection(Direction);
-    Projectile->SetOwner(GetOwner());
-    Projectile->FinishSpawning(SpawnTransform);
+    if (Projectile)
+    {
+        Projectile->SetShotDirection(Direction);
+        Projectile->SetOwner(GetOwner());
+        Projectile->FinishSpawning(SpawnTransform);
+    }
+
+    DecreaseAmmo();
 }
