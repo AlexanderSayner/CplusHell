@@ -33,6 +33,9 @@ public:
     // If for some reason weapon can not reload at all
     bool CanReload() const;
 
+    // Getter
+    FWeaponUIData GetUIData() const { return UIData; }
+
 protected:
     // Weapon mesh
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -46,11 +49,14 @@ protected:
     //
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FAmmoData DefaultAmmo{15, 10, false};
+    //
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+    FWeaponUIData UIData;
 
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    // Shot where look
+    // Shot in direction player looks
     virtual void MakeShot();
 
     // Shot trace

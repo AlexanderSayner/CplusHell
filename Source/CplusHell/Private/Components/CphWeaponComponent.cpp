@@ -70,6 +70,17 @@ void UCphWeaponComponent::Reload()
     ChangeClip();
 }
 
+// Returns true if weapon valid and ui set successfully
+bool UCphWeaponComponent::GetWeaponUIData(FWeaponUIData& UIData) const
+{
+    if (CurrentWeapon)
+    {
+        UIData = CurrentWeapon->GetUIData();
+        return true;
+    }
+    return false;
+}
+
 
 // Called when the game starts
 void UCphWeaponComponent::BeginPlay()

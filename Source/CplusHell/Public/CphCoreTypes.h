@@ -49,3 +49,19 @@ struct FWeaponData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
     UAnimMontage* ReloadAnimMontage;
 };
+
+/**
+ * Stores interface images for the current weapon, which can be changed if desired.
+ * Depending on which weapon is selected, this image will be displayed in the interface.
+ */
+USTRUCT(BlueprintType)
+struct FWeaponUIData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+    UTexture2D* WeaponIcon;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+    UTexture2D* CrossHairIcon;
+};

@@ -11,7 +11,7 @@
 /**
  * Ability for weapon changing
  */
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CPLUSHELL_API UCphWeaponComponent final : public UActorComponent
 {
     GENERATED_BODY()
@@ -29,6 +29,8 @@ public:
     void NextWeapon();
     // Reload action mapping
     void Reload();
+    // Returns true if weapon valid and ui set successfully
+    bool GetWeaponUIData(FWeaponUIData& UIData) const;
 
 protected:
     // Custom weapon class
@@ -89,10 +91,10 @@ private:
     bool CanFire() const;
     bool CanEquip() const;
     bool CanReload() const;
-    
+
     // Call by delegate FOnClipEmptySignature in Base Weapon 
     void OnEmptyClip();
-    
+
     // Utility logic
     void ChangeClip();
 };

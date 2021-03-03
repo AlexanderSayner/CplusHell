@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "CphCoreTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "CphPlayerWidgetHUD.generated.h"
 
@@ -18,4 +20,7 @@ public:
     // Progress bar value in UI
     UFUNCTION(BlueprintCallable, Category="UI")
     float GetHealthRatio() const;
+    // Cross Hair and weapon interface icons for current weapon
+    UFUNCTION(BlueprintCallable, Category="UI")
+    bool GetWeaponUIData(FWeaponUIData& UIData) const;
 };

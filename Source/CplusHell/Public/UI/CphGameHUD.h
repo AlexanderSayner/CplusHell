@@ -31,8 +31,4 @@ protected:
 
     // Creating player HUD widget
     virtual void BeginPlay() override;
-
-private:
-    // Drawing the cross
-    void DrawCrossHair();
 };

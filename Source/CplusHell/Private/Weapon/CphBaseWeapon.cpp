@@ -19,17 +19,15 @@ ACphBaseWeapon::ACphBaseWeapon()
     SetRootComponent(WeaponMesh);
 }
 
-//
+// for a child class implementation
 void ACphBaseWeapon::StartFire()
 {
 }
 
-//
 void ACphBaseWeapon::StopFire()
 {
 }
 
-//
 void ACphBaseWeapon::MakeShot()
 {
 }
