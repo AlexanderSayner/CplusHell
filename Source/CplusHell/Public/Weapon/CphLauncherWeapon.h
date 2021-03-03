@@ -18,7 +18,7 @@ class CPLUSHELL_API ACphLauncherWeapon final : public ACphBaseWeapon
     GENERATED_BODY()
 
 public:
-    virtual void Fire() override;
+    virtual void StartFire() override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")

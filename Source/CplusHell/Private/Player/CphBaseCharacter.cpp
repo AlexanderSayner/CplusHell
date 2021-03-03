@@ -115,7 +115,7 @@ void ACphBaseCharacter::SetupPlayerInputComponent(
 
     // Fire
     PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent,
-                                     &UCphWeaponComponent::Fire);
+                                     &UCphWeaponComponent::StartFire);
     PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent,
                                      &UCphWeaponComponent::StopFire);
 

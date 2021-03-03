@@ -5,7 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void ACphLauncherWeapon::Fire()
+void ACphLauncherWeapon::StartFire()
 {
     MakeShot();
 }

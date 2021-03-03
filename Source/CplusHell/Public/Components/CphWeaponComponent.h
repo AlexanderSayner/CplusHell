@@ -3,22 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "CphCoreTypes.h"
 #include "Components/ActorComponent.h"
 #include "CphWeaponComponent.generated.h"
-
-class ACphBaseWeapon;
-
-USTRUCT(BlueprintType)
-struct FWeaponData
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
-    TSubclassOf<ACphBaseWeapon> WeaponClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
-    UAnimMontage* ReloadAnimMontage;
-};
 
 /**
  * Ability for weapon changing
@@ -34,7 +22,7 @@ public:
     // Destroy player weapons
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     // Fire on action. Can not be const, because of using in BindAction
-    void Fire();
+    void StartFire();
     // On mouse button release. Can not be const, because of using in BindAction
     void StopFire();
     // Circle choosing weapon
@@ -101,30 +89,10 @@ private:
     bool CanFire() const;
     bool CanEquip() const;
     bool CanReload() const;
-
-    //
-    template <typename T>
-    T* FindFirstNotifyByClass(UAnimSequenceBase* Animation);
+    
+    // Call by delegate FOnClipEmptySignature in Base Weapon 
+    void OnEmptyClip();
+    
+    // Utility logic
+    void ChangeClip();
 };
-
-/**
- * Cycle for all notifiers in amin montage
- */
-template <typename T>
-T* UCphWeaponComponent::FindFirstNotifyByClass(UAnimSequenceBase* Animation)
-{
-    if (!Animation) return nullptr;
-
-    const TArray<struct FAnimNotifyEvent> Notifies = Animation->
-        Notifies;
-
-    for (const FAnimNotifyEvent NotifyEvent : Notifies)
-    {
-        T* AnimNotify = Cast<T>(NotifyEvent.Notify);
-        if (AnimNotify)
-        {
-            return AnimNotify;
-        }
-    }
-    return nullptr;
-}

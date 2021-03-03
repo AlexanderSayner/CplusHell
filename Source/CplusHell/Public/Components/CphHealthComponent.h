@@ -3,18 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "CphCoreTypes.h"
 #include "Components/ActorComponent.h"
 #include "CphHealthComponent.generated.h"
-
-// Delegate for telling player about his death
-DECLARE_MULTICAST_DELEGATE(FOnDeathSignature)
-// Call on heath change then player can print health on event but every tick
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float)
 
 /**
  * Healing and damage dealing politics
  */
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CPLUSHELL_API UCphHealthComponent final : public UActorComponent
 {
     GENERATED_BODY()

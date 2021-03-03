@@ -5,11 +5,11 @@
 
 #include "DrawDebugHelpers.h"
 
-void ACphRifleWeapon::Fire()
+void ACphRifleWeapon::StartFire()
 {
-    MakeShot();
     GetWorldTimerManager().SetTimer(ShotTimerHandle, this,
                                     &ACphRifleWeapon::MakeShot, ShotRate, true);
+    MakeShot();
 }
 
 void ACphRifleWeapon::StopFire()

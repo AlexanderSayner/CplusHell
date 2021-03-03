@@ -3,26 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "CphCoreTypes.h"
 #include "GameFramework/Actor.h"
 #include "CphBaseWeapon.generated.h"
 
 class USkeletalMeshComponent;
-
-USTRUCT(BlueprintType)
-struct FAmmoData
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    int32 Bullets; // Bullets count in weapon
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon",
-        meta = (EditCondition = "!Infinite"))
-    int32 Clips; // Bullets total
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    bool Infinite; // true - bullets are infinite, otherwise - false
-};
 
 /**
  * Utility logic for all weapons in the game
@@ -35,10 +21,17 @@ class CPLUSHELL_API ACphBaseWeapon : public AActor
 public:
     // Sets default values for this actor's properties
     ACphBaseWeapon();
+
+    FOnClipEmptySignature OnClipEmpty;
+
     //
-    virtual void Fire();
+    virtual void StartFire();
     //
     virtual void StopFire();
+    // Calls by Weapon Component 
+    void ChangeClip();
+    // If for some reason weapon can not reload at all
+    bool CanReload() const;
 
 protected:
     // Weapon mesh
@@ -51,7 +44,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float TraceMaxDistance = 3000.0f;
     //
-    UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     FAmmoData DefaultAmmo{15, 10, false};
 
     // Called when the game starts or when spawned
@@ -77,7 +70,6 @@ protected:
     void DecreaseAmmo();
     bool IsAmmoEmpty() const;
     bool IsClipEmpty() const;
-    void ChangeClip();
     void LogAmmo();
 
 private:

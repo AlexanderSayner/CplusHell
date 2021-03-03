@@ -2,12 +2,17 @@
 
 
 #include "Components/CphWeaponComponent.h"
+
+#include "Animations/AnimUtils.h"
 #include "Animations/CphEquipFinishedAnimNotify.h"
 #include "Animations/CphReloadFinishedAnimNotify.h"
 #include "GameFramework/Character.h"
 #include "Weapon/CphBaseWeapon.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCphWeaponComponent, All, All)
+
+// The only count of character's weapons, supported by my game
+constexpr static int32 WeaponNum = 2;
 
 // Sets default values for this component's properties
 UCphWeaponComponent::UCphWeaponComponent()
@@ -33,11 +38,11 @@ void UCphWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 // Fire on action. Can not be const, because of using in BindAction
-void UCphWeaponComponent::Fire()
+void UCphWeaponComponent::StartFire()
 {
     if (CanFire())
     {
-        CurrentWeapon->Fire();
+        CurrentWeapon->StartFire();
     }
 }
 
@@ -62,10 +67,7 @@ void UCphWeaponComponent::NextWeapon()
 // Reload action mapping
 void UCphWeaponComponent::Reload()
 {
-    if (!CanReload()) return;
-    StopFire();
-    ReloadAnimInProgress = true;
-    PlayAnimMontage(CurrentReloadAnimMontage);
+    ChangeClip();
 }
 
 
@@ -73,6 +75,9 @@ void UCphWeaponComponent::Reload()
 void UCphWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    checkf(WeaponData.Num() == WeaponNum,
+           TEXT("My character can hold only %i weapons"), WeaponNum)
 
     SpawnWeapons();
     check(CurrentWeaponIndex==0)
@@ -157,6 +162,8 @@ void UCphWeaponComponent::SpawnWeapons()
 
         if (Weapon)
         {
+            Weapon->OnClipEmpty.AddUObject(
+                this, &UCphWeaponComponent::OnEmptyClip);
             Weapon->SetOwner(Character);
             Weapons.Add(Weapon);
 
@@ -183,22 +190,38 @@ void UCphWeaponComponent::PlayAnimMontage(UAnimMontage* Animation) const
 void UCphWeaponComponent::InitAnimations()
 {
     UCphEquipFinishedAnimNotify* EquipFinishedAnimNotify =
-        FindFirstNotifyByClass<UCphEquipFinishedAnimNotify>(EquipAnimMontage);
+        FAnimUtils::FindFirstNotifyByClass<UCphEquipFinishedAnimNotify>(
+            EquipAnimMontage);
     if (EquipFinishedAnimNotify)
     {
         EquipFinishedAnimNotify->OnNotified.AddUObject(
             this, &UCphWeaponComponent::OnEquipFinished);
     }
+    else
+    {
+        UE_LOG(LogCphWeaponComponent, Error,
+               TEXT(
+                   "Equip and anim notify in amin montage is forgotten to set"))
+        checkNoEntry()
+    }
 
     for (FWeaponData Data : WeaponData)
     {
         UCphReloadFinishedAnimNotify* ReloadFinishedAnimNotify =
-            FindFirstNotifyByClass<UCphReloadFinishedAnimNotify>(
+            FAnimUtils::FindFirstNotifyByClass<UCphReloadFinishedAnimNotify>(
                 Data.ReloadAnimMontage);
         if (ReloadFinishedAnimNotify)
         {
             ReloadFinishedAnimNotify->OnNotified.AddUObject(
                 this, &UCphWeaponComponent::OnReloadFinished);
+        }
+        else
+        {
+            UE_LOG(LogCphWeaponComponent, Error,
+                   TEXT(
+                       "ReloadFinishedAnimNotify must be set in weapon Anim Montage"
+                   ))
+            checkNoEntry()
         }
     }
 }
@@ -236,5 +259,27 @@ bool UCphWeaponComponent::CanEquip() const
 //
 bool UCphWeaponComponent::CanReload() const
 {
-    return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress;
+    return CurrentWeapon
+           && !EquipAnimInProgress
+           && !ReloadAnimInProgress
+           && CurrentWeapon->CanReload();
+}
+
+// Call by delegate FOnClipEmptySignature in Base Weapon
+void UCphWeaponComponent::OnEmptyClip()
+{
+    ChangeClip();
+}
+
+// Utility logic
+void UCphWeaponComponent::ChangeClip()
+{
+    if (!CanReload()) return;
+    StopFire();
+    if (CurrentWeapon)
+    {
+        CurrentWeapon->ChangeClip();
+    }
+    ReloadAnimInProgress = true;
+    PlayAnimMontage(CurrentReloadAnimMontage);
 }

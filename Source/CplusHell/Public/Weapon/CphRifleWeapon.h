@@ -15,7 +15,7 @@ class CPLUSHELL_API ACphRifleWeapon final : public ACphBaseWeapon
     GENERATED_BODY()
 
 public:
-    virtual void Fire() override;
+    virtual void StartFire() override;
     virtual void StopFire() override;
 
 protected:

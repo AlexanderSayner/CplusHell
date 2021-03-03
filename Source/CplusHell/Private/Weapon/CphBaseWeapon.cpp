@@ -20,7 +20,7 @@ ACphBaseWeapon::ACphBaseWeapon()
 }
 
 //
-void ACphBaseWeapon::Fire()
+void ACphBaseWeapon::StartFire()
 {
 }
 
@@ -40,6 +40,10 @@ void ACphBaseWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(WeaponMesh)
+    checkf(DefaultAmmo.Bullets>0,
+           TEXT("Bullets count couldn't be less or equals zero"))
+    checkf(DefaultAmmo.Clips>0,
+           TEXT("Clips count couldn't be less or equals zero"))
     CurrentAmmo = DefaultAmmo;
 }
 
@@ -98,37 +102,61 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
                                          ECC_Visibility, CollisionParams);
 }
 
+//
 void ACphBaseWeapon::DecreaseAmmo()
 {
+    if (CurrentAmmo.Bullets == 0)
+    {
+        UE_LOG(LogCphBaseWeapon, Display, TEXT("Clip is empty"))
+        return;
+    }
+
     CurrentAmmo.Bullets--;
     LogAmmo();
 
     if (IsClipEmpty() && !IsAmmoEmpty())
     {
-        ChangeClip();
+        // Delegate will do animation and change weapon clip
+        StopFire();
+        OnClipEmpty.Broadcast();
     }
 }
 
+//
 bool ACphBaseWeapon::IsAmmoEmpty() const
 {
     return !CurrentAmmo.Infinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
 }
 
+//
 bool ACphBaseWeapon::IsClipEmpty() const
 {
     return CurrentAmmo.Bullets == 0;
 }
 
+//
 void ACphBaseWeapon::ChangeClip()
 {
-    CurrentAmmo.Bullets = DefaultAmmo.Bullets;
     if (!CurrentAmmo.Infinite)
     {
+        if (CurrentAmmo.Clips == 0)
+        {
+            UE_LOG(LogCphBaseWeapon, Display, TEXT("No more clips in hell"))
+            return;
+        }
         CurrentAmmo.Clips--;
     }
+    CurrentAmmo.Bullets = DefaultAmmo.Bullets;
     UE_LOG(LogCphBaseWeapon, Display, TEXT("Changed clip"))
 }
 
+// If for some reason weapon can not reload at all
+bool ACphBaseWeapon::CanReload() const
+{
+    return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
+}
+
+//
 void ACphBaseWeapon::LogAmmo()
 {
     FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + "\n";
