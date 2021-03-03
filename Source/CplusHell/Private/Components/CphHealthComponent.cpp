@@ -14,7 +14,7 @@ UCphHealthComponent::UCphHealthComponent()
 }
 
 // Returns value between zero and one
-float UCphHealthComponent::GetHealthPercent() const
+float UCphHealthComponent::GetHealthRatio() const
 {
     return Health / MaxHealth;
 }

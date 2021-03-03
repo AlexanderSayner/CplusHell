@@ -30,7 +30,7 @@ public:
 
     // Returns value between zero and one
     UFUNCTION(BlueprintCallable, Category="Health")
-    float GetHealthPercent() const;
+    float GetHealthRatio() const;
 
     // Getter
     float GetHealth() const { return Health; }

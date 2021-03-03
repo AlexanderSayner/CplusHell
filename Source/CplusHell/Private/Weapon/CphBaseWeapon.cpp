@@ -50,7 +50,7 @@ void ACphBaseWeapon::BeginPlay()
 // Returns nullptr if fails
 APlayerController* ACphBaseWeapon::GetPlayerController() const
 {
-    const auto Player = Cast<ACharacter>(GetOwner());
+    ACharacter* const Player = Cast<ACharacter>(GetOwner());
     if (!Player) return nullptr;
 
     return Player->GetController<APlayerController>();
