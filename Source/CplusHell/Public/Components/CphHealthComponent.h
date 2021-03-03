@@ -28,6 +28,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Health")
     bool IsAlive() const { return !FMath::IsNearlyZero(Health, 0.5f); }
 
+    // Returns value between zero and one
+    UFUNCTION(BlueprintCallable, Category="Health")
+    float GetHealthPercent() const;
+
     // Getter
     float GetHealth() const { return Health; }
 
@@ -43,7 +47,7 @@ protected:
 
     // Time interval of healing in seconds
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
-        meta = (ClampMin = "0.1", ClampMax = "60.0",
+        meta = (ClampMin = "0.01", ClampMax = "60.0",
             EditCondition = "AutoHeal"))
     float HealUpdateTime = 1.0f;
 

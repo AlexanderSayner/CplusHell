@@ -13,12 +13,19 @@ UCphHealthComponent::UCphHealthComponent()
     // ...
 }
 
+// Returns value between zero and one
+float UCphHealthComponent::GetHealthPercent() const
+{
+    return Health / MaxHealth;
+}
+
 
 // Called when the game starts
 void UCphHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+    check(MaxHealth > 0)
     SetHealth(MaxHealth);
 
     AActor* ComponentOwner = GetOwner();
@@ -55,7 +62,7 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
     {
         OnDeath.Broadcast();
         // Stop healing
-        if(GetWorld())
+        if (GetWorld())
         {
             GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
         }
