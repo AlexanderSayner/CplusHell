@@ -6,6 +6,7 @@
 
 #include "CphCoreTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CphHealthComponent.h"
 #include "Components/CphWeaponComponent.h"
 #include "CphPlayerWidgetHUD.generated.h"
 
@@ -31,8 +32,15 @@ public:
     // Const for each weapon in game instance default ammo
     UFUNCTION(BlueprintCallable, Category="UI")
     bool GetDefaultBulletsDataUI(FAmmoData& AmmoData) const;
+    // 
+    UFUNCTION(BlueprintCallable, Category="Spectating")
+    bool IsPlayerAlive() const;
+    //
+    UFUNCTION(BlueprintCallable, Category="Spectating")
+    bool IsPlayerSpectating() const;
 
 private:
     // Returns nullptr if fails
     UCphWeaponComponent* GetWeaponComponent() const;
+    UCphHealthComponent* GetHealthComponent() const;
 };

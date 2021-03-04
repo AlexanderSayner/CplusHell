@@ -9,14 +9,7 @@
 // Progress bar value in UI
 float UCphPlayerWidgetHUD::GetHealthRatio() const
 {
-    const APawn* Player = GetOwningPlayerPawn();
-    if (!Player) return 0.0f;
-
-    const UActorComponent* Component =
-        Player->GetComponentByClass(UCphHealthComponent::StaticClass());
-    // nullptr Cast returns nullptr
-    const UCphHealthComponent* const HealthComponent =
-        Cast<UCphHealthComponent>(Component);
+    const UCphHealthComponent* HealthComponent = GetHealthComponent();
     if (!HealthComponent) return 0.0f;
 
     return HealthComponent->GetHealthRatio();
@@ -49,6 +42,22 @@ bool UCphPlayerWidgetHUD::GetDefaultBulletsDataUI(FAmmoData& AmmoData) const
     return WeaponComponent->GetWeaponDefaultAmmoUI(AmmoData);
 }
 
+//
+bool UCphPlayerWidgetHUD::IsPlayerAlive() const
+{
+    // Then health runs out, Spectator Pawn takes control of the Player Controller
+    // After which HealthComponent equals nullptr and HealthComponent->IsAlive() is useless 
+    const UCphHealthComponent* HealthComponent = GetHealthComponent();
+    return HealthComponent && HealthComponent->IsAlive();
+}
+
+//
+bool UCphPlayerWidgetHUD::IsPlayerSpectating() const
+{
+    const APlayerController* Controller = GetOwningPlayer();
+    return Controller && Controller->GetStateName() == NAME_Spectating;
+}
+
 // Returns nullptr if fails
 UCphWeaponComponent* UCphPlayerWidgetHUD::GetWeaponComponent() const
 {
@@ -57,8 +66,22 @@ UCphWeaponComponent* UCphPlayerWidgetHUD::GetWeaponComponent() const
 
     UActorComponent* Component = Player->GetComponentByClass(
         UCphWeaponComponent::StaticClass());
-    UCphWeaponComponent* WeaponComponent =
-        Cast<UCphWeaponComponent>(Component);
+    UCphWeaponComponent* WeaponComponent = Cast<UCphWeaponComponent>(Component);
+    // nullptr Cast returns nullptr
 
     return WeaponComponent;
+}
+
+// Returns nullptr if fails
+UCphHealthComponent* UCphPlayerWidgetHUD::GetHealthComponent() const
+{
+    const APawn* Player = GetOwningPlayerPawn();
+    if (!Player) return nullptr;
+
+    UActorComponent* Component = Player->GetComponentByClass(
+        UCphHealthComponent::StaticClass());
+    UCphHealthComponent* HealthComponent = Cast<UCphHealthComponent>(Component);
+    // nullptr Cast returns nullptr
+
+    return HealthComponent;
 }

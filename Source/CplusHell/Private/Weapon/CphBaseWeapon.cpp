@@ -110,7 +110,6 @@ void ACphBaseWeapon::DecreaseAmmo()
     }
 
     CurrentAmmo.Bullets--;
-    LogAmmo();
 
     if (IsClipEmpty() && !IsAmmoEmpty())
     {
@@ -152,14 +151,4 @@ void ACphBaseWeapon::ChangeClip()
 bool ACphBaseWeapon::CanReload() const
 {
     return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
-}
-
-//
-void ACphBaseWeapon::LogAmmo()
-{
-    FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " / ";
-    AmmoInfo += CurrentAmmo.Infinite
-                    ? "Infinite"
-                    : FString::FromInt(CurrentAmmo.Clips);
-    UE_LOG(LogCphBaseWeapon, Display, TEXT("%s"), *AmmoInfo);
 }
