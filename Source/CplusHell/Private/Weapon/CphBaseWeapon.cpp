@@ -157,9 +157,9 @@ bool ACphBaseWeapon::CanReload() const
 //
 void ACphBaseWeapon::LogAmmo()
 {
-    FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + "\n";
+    FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " / ";
     AmmoInfo += CurrentAmmo.Infinite
                     ? "Infinite"
                     : FString::FromInt(CurrentAmmo.Clips);
-    UE_LOG(LogCphBaseWeapon, Display, TEXT("Ammunition Stats\n%s"), *AmmoInfo);
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("%s"), *AmmoInfo);
 }

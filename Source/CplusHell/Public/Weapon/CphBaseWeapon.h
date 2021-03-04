@@ -33,8 +33,10 @@ public:
     // If for some reason weapon can not reload at all
     bool CanReload() const;
 
-    // Getter
-    FWeaponUIData GetUIData() const { return UIData; }
+    // Getters
+    FWeaponDataUI GetUIData() const { return UIData; }
+    FAmmoData GetCurrentAmmoData() const { return CurrentAmmo; }
+    FAmmoData GetDefaultAmmoData() const { return DefaultAmmo; }
 
 protected:
     // Weapon mesh
@@ -51,7 +53,7 @@ protected:
     FAmmoData DefaultAmmo{15, 10, false};
     //
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
-    FWeaponUIData UIData;
+    FWeaponDataUI UIData;
 
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;

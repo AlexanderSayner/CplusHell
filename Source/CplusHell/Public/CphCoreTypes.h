@@ -25,11 +25,11 @@ struct FAmmoData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    int32 Bullets; // Bullets count in weapon
+    int32 Bullets; // Remain bullets in clip
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon",
         meta = (EditCondition = "!Infinite"))
-    int32 Clips; // Bullets total
+    int32 Clips; // Clips total
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     bool Infinite; // true - bullets are infinite, otherwise - false
@@ -55,7 +55,7 @@ struct FWeaponData
  * Depending on which weapon is selected, this image will be displayed in the interface.
  */
 USTRUCT(BlueprintType)
-struct FWeaponUIData
+struct FWeaponDataUI
 {
     GENERATED_USTRUCT_BODY()
 

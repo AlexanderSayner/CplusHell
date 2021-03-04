@@ -29,8 +29,10 @@ public:
     void NextWeapon();
     // Reload action mapping
     void Reload();
-    // Returns true if weapon valid and ui set successfully
-    bool GetWeaponUIData(FWeaponUIData& UIData) const;
+    // Returns true if weapon valid and ui set successfully.
+    bool GetWeaponDataUI(FWeaponDataUI& UIData) const;
+    bool GetWeaponAmmoUI(FAmmoData& AmmoData) const;
+    bool GetWeaponDefaultAmmoUI(FAmmoData& DefaultAmmoData) const;
 
 protected:
     // Custom weapon class
@@ -85,6 +87,7 @@ private:
     void InitAnimations();
     // Could not be static because of using in delegate callback
     void OnEquipFinished(USkeletalMeshComponent* MeshComponent);
+    // Changing clip here, only when reload animation is finished
     void OnReloadFinished(USkeletalMeshComponent* MeshComponent);
 
     // Solution for non stop weapon changing

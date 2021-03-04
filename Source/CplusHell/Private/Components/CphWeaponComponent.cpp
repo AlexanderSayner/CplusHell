@@ -71,11 +71,33 @@ void UCphWeaponComponent::Reload()
 }
 
 // Returns true if weapon valid and ui set successfully
-bool UCphWeaponComponent::GetWeaponUIData(FWeaponUIData& UIData) const
+bool UCphWeaponComponent::GetWeaponDataUI(FWeaponDataUI& UIData) const
 {
     if (CurrentWeapon)
     {
         UIData = CurrentWeapon->GetUIData();
+        return true;
+    }
+    return false;
+}
+
+// Returns true if weapon valid and ui set successfully
+bool UCphWeaponComponent::GetWeaponAmmoUI(FAmmoData& AmmoData) const
+{
+    if (CurrentWeapon)
+    {
+        AmmoData = CurrentWeapon->GetCurrentAmmoData();
+        return true;
+    }
+    return false;
+}
+
+// Returns true if weapon valid and ui set successfully
+bool UCphWeaponComponent::GetWeaponDefaultAmmoUI(FAmmoData& DefaultAmmoData) const
+{
+    if (CurrentWeapon)
+    {
+        DefaultAmmoData = CurrentWeapon->GetDefaultAmmoData();
         return true;
     }
     return false;
@@ -246,12 +268,20 @@ void UCphWeaponComponent::OnEquipFinished(USkeletalMeshComponent* MeshComponent)
     EquipAnimInProgress = false;
 }
 
-//
+// Changing clip here, only when reload animation is finished
 void UCphWeaponComponent::OnReloadFinished(
     USkeletalMeshComponent* MeshComponent)
 {
     ACharacter* Character = Cast<ACharacter>(GetOwner());
     if (!Character || MeshComponent != Character->GetMesh()) return;
+
+    // OnReloadFinished function calls two times for some reason.
+    // That is why ReloadAnimInProgress check is needed
+    if (CurrentWeapon && ReloadAnimInProgress)
+    {
+        CurrentWeapon->ChangeClip();
+    }
+
     ReloadAnimInProgress = false;
 }
 
@@ -287,10 +317,6 @@ void UCphWeaponComponent::ChangeClip()
 {
     if (!CanReload()) return;
     StopFire();
-    if (CurrentWeapon)
-    {
-        CurrentWeapon->ChangeClip();
-    }
     ReloadAnimInProgress = true;
     PlayAnimMontage(CurrentReloadAnimMontage);
 }
