@@ -24,10 +24,12 @@ void ACphBaseWeapon::StartFire()
 {
 }
 
+// for a child class implementation
 void ACphBaseWeapon::StopFire()
 {
 }
 
+// Do specific logic for each weapon
 void ACphBaseWeapon::MakeShot()
 {
 }
@@ -38,11 +40,14 @@ void ACphBaseWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(WeaponMesh)
-    checkf(DefaultAmmo.Bullets>0,
+    checkf(DefaultAmmo.BulletsInClip>0,
            TEXT("Bullets count couldn't be less or equals zero"))
-    checkf(DefaultAmmo.Clips>0,
+    checkf(DefaultAmmo.BulletsInTotal>0,
            TEXT("Clips count couldn't be less or equals zero"))
+
     CurrentAmmo = DefaultAmmo;
+    // First clip is not free
+    CurrentAmmo.BulletsInTotal -= DefaultAmmo.BulletsInClip;
 }
 
 // Returns nullptr if fails
@@ -100,17 +105,19 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
                                          ECC_Visibility, CollisionParams);
 }
 
-//
+// Changing current ammo count
 void ACphBaseWeapon::DecreaseAmmo()
 {
-    if (CurrentAmmo.Bullets == 0)
+    // Can't decrease ammo, if it is zero already
+    if (CurrentAmmo.BulletsInClip == 0)
     {
         UE_LOG(LogCphBaseWeapon, Display, TEXT("Clip is empty"))
         return;
     }
 
-    CurrentAmmo.Bullets--;
+    CurrentAmmo.BulletsInClip--;
 
+    // If my clip is empty, i should have some bullets in my pocket for reloading
     if (IsClipEmpty() && !IsAmmoEmpty())
     {
         // Delegate will do animation and change weapon clip
@@ -119,36 +126,84 @@ void ACphBaseWeapon::DecreaseAmmo()
     }
 }
 
-//
+// Is bullets ended in clip and also in stock
 bool ACphBaseWeapon::IsAmmoEmpty() const
 {
-    return !CurrentAmmo.Infinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
+    return !CurrentAmmo.Infinite && CurrentAmmo.BulletsInTotal == 0 &&
+           IsClipEmpty();
 }
 
-//
+// Set defaults bullets, bul reduce current ammo clip by 1
 bool ACphBaseWeapon::IsClipEmpty() const
 {
-    return CurrentAmmo.Bullets == 0;
+    return CurrentAmmo.BulletsInClip == 0;
 }
 
-//
+// Compare default ammo with current
+bool ACphBaseWeapon::IsAmmoFull() const
+{
+    // Player starts with empty clip, then reload
+    return CurrentAmmo.BulletsInTotal + CurrentAmmo.BulletsInClip ==
+           DefaultAmmo.BulletsInTotal;
+}
+
+// Called on end of animation. Set defaults bullets, but reduce current ammo clip by 1
 void ACphBaseWeapon::ChangeClip()
 {
     if (!CurrentAmmo.Infinite)
     {
-        if (CurrentAmmo.Clips == 0)
+        if (CurrentAmmo.BulletsInTotal == 0)
         {
-            UE_LOG(LogCphBaseWeapon, Display, TEXT("No more clips in hell"))
+            UE_LOG(LogCphBaseWeapon, Warning, TEXT("No more bullets in hell"))
             return;
         }
-        CurrentAmmo.Clips--;
+
+        const int BulletsLack = DefaultAmmo.BulletsInClip
+                                - CurrentAmmo.BulletsInClip;
+        const int Supplement = FMath::Clamp(BulletsLack, 0,
+                                            CurrentAmmo.BulletsInTotal);
+
+        CurrentAmmo.BulletsInClip += Supplement;
+        CurrentAmmo.BulletsInTotal -= Supplement;
     }
-    CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+    else
+    {
+        CurrentAmmo.BulletsInClip = DefaultAmmo.BulletsInClip;
+    }
     UE_LOG(LogCphBaseWeapon, Display, TEXT("Changed clip"))
 }
 
-// If for some reason weapon can not reload at all
+// Asks, before animation started to play
 bool ACphBaseWeapon::CanReload() const
 {
-    return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
+    return CurrentAmmo.BulletsInClip < DefaultAmmo.BulletsInClip
+           && CurrentAmmo.BulletsInTotal > 0;
+}
+
+// Taking ammo bonus or not taking
+bool ACphBaseWeapon::TryToAddAmmo(const int32 BulletsAmount)
+{
+    if (CurrentAmmo.Infinite || IsAmmoFull() || BulletsAmount <= 0)
+        return false;
+
+    // how much can I put in
+    const int FreeAmmoSpace = DefaultAmmo.BulletsInTotal -
+                              (CurrentAmmo.BulletsInClip
+                               + CurrentAmmo.BulletsInTotal);
+
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("Total bullets before %i"),
+           CurrentAmmo.BulletsInTotal)
+
+    const int32 Clamp = FMath::Clamp(BulletsAmount, 0,
+                                     FreeAmmoSpace);
+
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("Clamp %i"), Clamp)
+
+    // You can not take more, then you can carry
+    CurrentAmmo.BulletsInTotal += Clamp;
+
+    UE_LOG(LogCphBaseWeapon, Display, TEXT("Total bullets after %i"),
+           CurrentAmmo.BulletsInTotal)
+    //OnClipEmpty.Broadcast(); // Broadcast for reload
+    return true;
 }

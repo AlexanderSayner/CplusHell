@@ -19,6 +19,18 @@ float UCphHealthComponent::GetHealthRatio() const
     return Health / MaxHealth;
 }
 
+// Add some health
+bool UCphHealthComponent::TryToAddHealth(const int32 HealthAmount)
+{
+    if (!IsAlive())
+        return false;
+
+    if (FMath::IsNearlyEqual(Health, MaxHealth, 0.1f))
+        return false;
+
+    SetHealth(Health + HealthAmount);
+    return true;
+}
 
 // Called when the game starts
 void UCphHealthComponent::BeginPlay()

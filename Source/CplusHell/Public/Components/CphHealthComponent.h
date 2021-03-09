@@ -29,11 +29,14 @@ public:
     bool IsAlive() const { return !FMath::IsNearlyZero(Health, 0.5f); }
 
     // Returns value between zero and one
-    UFUNCTION(BlueprintCallable, Category="Health")
+    UFUNCTION(BlueprintCallable, Category = "Health")
     float GetHealthRatio() const;
 
     // Getter
     float GetHealth() const { return Health; }
+
+    // Add some health
+    bool TryToAddHealth(const int32 HealthAmount);
 
 protected:
     // Setting for max health

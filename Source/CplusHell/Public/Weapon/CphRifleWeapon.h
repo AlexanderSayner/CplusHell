@@ -31,10 +31,12 @@ protected:
     float BulletSpread = 1.5f;
 
     virtual void MakeShot() override;
+    // Returns false when fails
     virtual bool GetTraceData(FVector& TraceStart,
                               FVector& TraceEnd) const override;
 
 private:
+    // Rifle shot rate control
     FTimerHandle ShotTimerHandle;
 
     // Deal damage to hit actor

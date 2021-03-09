@@ -21,7 +21,7 @@ public:
     UCphWeaponComponent();
     // Destroy player weapons
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-    // Fire on action. Can not be const, because of using in BindAction
+    // Fire on player action. Can not be const, because of using in BindAction
     void StartFire();
     // On mouse button release. Can not be const, because of using in BindAction
     void StopFire();
@@ -32,7 +32,10 @@ public:
     // Returns true if weapon valid and ui set successfully.
     bool GetWeaponDataUI(FWeaponDataUI& UIData) const;
     bool GetWeaponAmmoUI(FAmmoData& AmmoData) const;
-    bool GetWeaponDefaultAmmoUI(FAmmoData& DefaultAmmoData) const;
+
+    // Add some ammo bonus
+    bool TryToAddAmmo(const TSubclassOf<ACphBaseWeapon> WeaponType,
+                      const int32 BulletsAmount);
 
 protected:
     // Custom weapon class
@@ -53,7 +56,7 @@ protected:
     virtual void BeginPlay() override;
 
 private:
-    // Set a first one in Begin Play
+    // Set a weapon than player hold in his hands
     UPROPERTY()
     ACphBaseWeapon* CurrentWeapon = nullptr;
 

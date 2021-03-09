@@ -40,7 +40,7 @@ protected:
     // For display health number
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UTextRenderComponent* HealthTextComponent;
-    //
+    // Weapon management
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCphWeaponComponent* WeaponComponent;
     // Play death animation

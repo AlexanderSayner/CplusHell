@@ -33,15 +33,6 @@ bool UCphPlayerWidgetHUD::GetCurrentBulletsDataUI(FAmmoData& AmmoData) const
     return WeaponComponent->GetWeaponAmmoUI(AmmoData);
 }
 
-// Const for each weapon in game instance default ammo
-bool UCphPlayerWidgetHUD::GetDefaultBulletsDataUI(FAmmoData& AmmoData) const
-{
-    const UCphWeaponComponent* WeaponComponent = GetWeaponComponent();
-    if (!WeaponComponent) return false;
-
-    return WeaponComponent->GetWeaponDefaultAmmoUI(AmmoData);
-}
-
 //
 bool UCphPlayerWidgetHUD::IsPlayerAlive() const
 {
@@ -66,8 +57,8 @@ UCphWeaponComponent* UCphPlayerWidgetHUD::GetWeaponComponent() const
 
     UActorComponent* Component = Player->GetComponentByClass(
         UCphWeaponComponent::StaticClass());
-    UCphWeaponComponent* WeaponComponent = Cast<UCphWeaponComponent>(Component);
     // nullptr Cast returns nullptr
+    UCphWeaponComponent* WeaponComponent = Cast<UCphWeaponComponent>(Component);
 
     return WeaponComponent;
 }
@@ -80,8 +71,8 @@ UCphHealthComponent* UCphPlayerWidgetHUD::GetHealthComponent() const
 
     UActorComponent* Component = Player->GetComponentByClass(
         UCphHealthComponent::StaticClass());
-    UCphHealthComponent* HealthComponent = Cast<UCphHealthComponent>(Component);
     // nullptr Cast returns nullptr
+    UCphHealthComponent* HealthComponent = Cast<UCphHealthComponent>(Component);
 
     return HealthComponent;
 }

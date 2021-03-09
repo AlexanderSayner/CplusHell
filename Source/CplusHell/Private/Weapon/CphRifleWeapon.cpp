@@ -56,6 +56,7 @@ void ACphRifleWeapon::MakeShot()
     DecreaseAmmo();
 }
 
+// Returns false when fails
 bool ACphRifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 {
     FVector ViewLocation;

@@ -17,19 +17,21 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float)
 DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature)
 
 /**
- * Weapon settings
+ * Using two structures for each weapon - default and current.
+ * Default is weapon settings like clip capacity and bullets count in total,
+ * but current is how many bullets remaining for player 
  */
 USTRUCT(BlueprintType)
 struct FAmmoData
 {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
-    int32 Bullets; // Remain bullets in clip
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullets")
+    int32 BulletsInClip; // Bullets remaining
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullets",
         meta = (EditCondition = "!Infinite"))
-    int32 Clips; // Clips total
+    int32 BulletsInTotal; // Ammo stock in players inventory
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     bool Infinite; // true - bullets are infinite, otherwise - false
@@ -43,10 +45,10 @@ struct FWeaponData
 {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     TSubclassOf<ACphBaseWeapon> WeaponClass;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     UAnimMontage* ReloadAnimMontage;
 };
 
@@ -59,9 +61,9 @@ struct FWeaponDataUI
 {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     UTexture2D* WeaponIcon;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     UTexture2D* CrossHairIcon;
 };

@@ -37,7 +37,7 @@ void UCphWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 }
 
-// Fire on action. Can not be const, because of using in BindAction
+// Fire on player action. Can not be const, because of using in BindAction
 void UCphWeaponComponent::StartFire()
 {
     if (CanFire())
@@ -92,13 +92,17 @@ bool UCphWeaponComponent::GetWeaponAmmoUI(FAmmoData& AmmoData) const
     return false;
 }
 
-// Returns true if weapon valid and ui set successfully
-bool UCphWeaponComponent::GetWeaponDefaultAmmoUI(FAmmoData& DefaultAmmoData) const
+// Add some ammo bonus
+bool UCphWeaponComponent::TryToAddAmmo(
+    const TSubclassOf<ACphBaseWeapon> WeaponType,
+    const int32 BulletsAmount)
 {
-    if (CurrentWeapon)
+    for (ACphBaseWeapon* Weapon : Weapons)
     {
-        DefaultAmmoData = CurrentWeapon->GetDefaultAmmoData();
-        return true;
+        if (Weapon && Weapon->IsA(WeaponType))
+        {
+            return Weapon->TryToAddAmmo(BulletsAmount);
+        }
     }
     return false;
 }

@@ -29,9 +29,6 @@ public:
     // Returns false if not valid
     UFUNCTION(BlueprintCallable, Category="UI")
     bool GetCurrentBulletsDataUI(FAmmoData& AmmoData) const;
-    // Const for each weapon in game instance default ammo
-    UFUNCTION(BlueprintCallable, Category="UI")
-    bool GetDefaultBulletsDataUI(FAmmoData& AmmoData) const;
     // 
     UFUNCTION(BlueprintCallable, Category="Spectating")
     bool IsPlayerAlive() const;
