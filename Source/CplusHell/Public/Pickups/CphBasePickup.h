@@ -37,8 +37,13 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 private:
+    // Starting animation yaw
+    float RotationYaw = 0.0f;
+
     // Make bonus invisible
     void PickupWasTaken();
     // Make visible
-    void Respawn() const;
+    void Respawn();
+    // Calls on pickup spawn and respawn
+    void GenerateRotationYaw();
 };

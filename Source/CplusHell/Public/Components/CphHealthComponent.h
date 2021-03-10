@@ -86,6 +86,7 @@ private:
                          const class UDamageType* DamageType,
                          class AController* InstigatedBy,
                          AActor* DamageCauser);
+                         
     // Updates health on Heal Modifier delta and stops timer then necessary 
     void HealUpdate();
 };

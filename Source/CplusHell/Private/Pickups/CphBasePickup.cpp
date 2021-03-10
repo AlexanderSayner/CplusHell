@@ -26,11 +26,13 @@ void ACphBasePickup::BeginPlay()
 
     check(GetRootComponent())
     check(CollisionComponent)
+
+    GenerateRotationYaw();
 }
 
 // For child classed implementing
 bool ACphBasePickup::AddSomeBuffsTo(APawn* Pawn)
-{ 
+{
     return false;
 }
 
@@ -54,6 +56,8 @@ void ACphBasePickup::NotifyActorBeginOverlap(AActor* OtherActor)
 void ACphBasePickup::Tick(const float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    AddActorLocalRotation(FRotator(0.0f, RotationYaw, 0.0f));
 }
 
 // Make bonus invisible
@@ -69,9 +73,17 @@ void ACphBasePickup::PickupWasTaken()
 }
 
 // Make visible
-void ACphBasePickup::Respawn() const
+void ACphBasePickup::Respawn() 
 {
+    GenerateRotationYaw();
     CollisionComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
     GetRootComponent()->SetVisibility(true, true);
     UE_LOG(LogBasePickup, Display, TEXT("Setted visibility to true"))
+}
+
+// Calls on spawning pickup
+void ACphBasePickup::GenerateRotationYaw()
+{
+    const float Direction = FMath::RandBool() ? 1.0f : -1.0f;
+    RotationYaw = FMath::RandRange(1.0f, 2.0f) * Direction;
 }
