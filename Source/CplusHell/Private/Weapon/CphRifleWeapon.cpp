@@ -5,6 +5,14 @@
 
 #include "DrawDebugHelpers.h"
 
+// Construct VFX
+ACphRifleWeapon::ACphRifleWeapon()
+{
+    WeaponComponentFX = CreateDefaultSubobject<UCphWeaponComponentFX>(
+        "WeaponComponentFX");
+}
+
+//
 void ACphRifleWeapon::StartFire()
 {
     GetWorldTimerManager().SetTimer(ShotTimerHandle, this,
@@ -12,11 +20,21 @@ void ACphRifleWeapon::StartFire()
     MakeShot();
 }
 
+//
 void ACphRifleWeapon::StopFire()
 {
     GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 }
 
+//
+void ACphRifleWeapon::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(WeaponComponentFX)
+}
+
+//
 void ACphRifleWeapon::MakeShot()
 {
     if (!GetWorld() || IsAmmoEmpty())
@@ -38,13 +56,15 @@ void ACphRifleWeapon::MakeShot()
     // If got
     if (HitResult.bBlockingHit)
     {
+        /*
         DrawDebugLine(GetWorld(),
                       GetMuzzleWorldLocation(),
                       HitResult.ImpactPoint,
                       FColor::Red, false, 3.0f, 0, 3.0f);
         DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
-                        FColor::Red, false, 5.0f);
+                        FColor::Red, false, 5.0f); */
         MakeDamage(HitResult);
+        WeaponComponentFX->PlayImpactFX(HitResult);
     }
     else
     {

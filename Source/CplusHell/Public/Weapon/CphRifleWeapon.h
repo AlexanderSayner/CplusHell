@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/CphWeaponComponentFX.h"
 #include "Weapon/CphBaseWeapon.h"
 #include "CphRifleWeapon.generated.h"
 
@@ -15,6 +17,8 @@ class CPLUSHELL_API ACphRifleWeapon final : public ACphBaseWeapon
     GENERATED_BODY()
 
 public:
+    ACphRifleWeapon();
+    
     virtual void StartFire() override;
     virtual void StopFire() override;
 
@@ -30,6 +34,13 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float BulletSpread = 1.5f;
 
+    // Rifle effect
+    UPROPERTY(VisibleAnywhere, Category="VFX")
+    UCphWeaponComponentFX* WeaponComponentFX;
+
+    //
+    virtual void BeginPlay() override;
+    
     virtual void MakeShot() override;
     // Returns false when fails
     virtual bool GetTraceData(FVector& TraceStart,

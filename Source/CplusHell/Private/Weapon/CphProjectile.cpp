@@ -8,6 +8,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Weapon/Components/CphWeaponComponentFX.h"
 
 // Sets default values
 ACphProjectile::ACphProjectile()
@@ -25,6 +26,9 @@ ACphProjectile::ACphProjectile()
     MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(
         "ProjectileMovementComponent");
     MovementComponent->InitialSpeed = 5000.0f;
+
+    WeaponComponentFX = CreateDefaultSubobject<UCphWeaponComponentFX>(
+        "WeaponComponentFX");
 }
 
 // Launcher sets Direction, then spawn
@@ -40,6 +44,7 @@ void ACphProjectile::BeginPlay()
 
     check(CollisionComponent)
     check(MovementComponent)
+    check(WeaponComponentFX)
 
     CollisionComponent->OnComponentHit.AddDynamic(
         this, &ACphProjectile::OnProjectileHit);
@@ -80,6 +85,9 @@ void ACphProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent,
                     FColor::Red,
                     false,
                     5.0f);
+
+    // Visual effect
+    WeaponComponentFX->PlayImpactFX(Hit);
 
     // Destroy then hits or after life span time
     Destroy();
