@@ -99,6 +99,8 @@ void ACphBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
     // Ignore player itself
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(GetOwner());
+    // Pass physical material for choosing right effect
+    CollisionParams.bReturnPhysicalMaterial = true;
 
     // Draw interception sphere
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,

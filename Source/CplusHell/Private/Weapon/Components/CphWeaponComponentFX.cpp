@@ -17,9 +17,22 @@ UCphWeaponComponentFX::UCphWeaponComponentFX()
 // Spawn effect
 void UCphWeaponComponentFX::PlayImpactFX(const FHitResult& Hit)
 {
+    UNiagaraSystem* Effect = DefaultEffect;
+
+    // Playing effect depends on physical material where bullet goes
+    if (Hit.PhysMaterial.IsValid())
+    {
+        const UPhysicalMaterial* PhysMat = Hit.PhysMaterial.Get();
+        if (EffectsMap.Contains(PhysMat))
+        {
+            Effect = EffectsMap[PhysMat];
+        }
+    }
+
     // World context, Niagara System, Location in world, Orientation in world
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-        GetWorld(), Effect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+        GetWorld(), Effect, Hit.ImpactPoint,
+        Hit.ImpactNormal.Rotation());
 }
 
 

@@ -10,11 +10,12 @@ public class CplusHell : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new[]
 		{
-			"Core", 
+			"Core",
 			"CoreUObject",
 			"Engine",
 			"InputCore",
-			"Niagara"
+			"Niagara",
+			"PhysicsCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

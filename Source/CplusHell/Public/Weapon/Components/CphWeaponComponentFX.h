@@ -8,6 +8,7 @@
 #include "CphWeaponComponentFX.generated.h"
 
 class UNiagaraSystem;
+class UPhysicalMaterial;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CPLUSHELL_API UCphWeaponComponentFX final : public UActorComponent
@@ -27,7 +28,10 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
     // ReSharper disable once UnrealHeaderToolParserError
-    UNiagaraSystem* Effect;
+    UNiagaraSystem* DefaultEffect;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    TMap<UPhysicalMaterial*, UNiagaraSystem*> EffectsMap;
 
 public:
     // Called every frame
