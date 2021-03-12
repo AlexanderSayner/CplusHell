@@ -67,11 +67,13 @@ void ACphBaseCharacter::BeginPlay()
     check(GetMesh())
 
     // Init health before delegate declaration
-    OnHealthChanged(HealthComponent->GetHealth());
+    OnHealthChanged(HealthComponent->GetHealth(), 0.0f);
+    
     HealthComponent->OnDeath
                    .AddUObject(this, &ACphBaseCharacter::OnDeath);
     HealthComponent->OnHealthChanged
                    .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
+    
     // Subscribe for landing
     LandedDelegate.AddDynamic(this, &ACphBaseCharacter::OnGroundLanded);
 }
@@ -211,7 +213,8 @@ void ACphBaseCharacter::OnDeath()
 }
 
 // Health changed event
-void ACphBaseCharacter::OnHealthChanged(const float Health) const
+void ACphBaseCharacter::OnHealthChanged(const float Health,
+                                        const float Delta) const
 {
     // Display health number
     HealthTextComponent->SetText(

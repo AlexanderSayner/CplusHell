@@ -8,8 +8,8 @@ class ACphBaseWeapon;
 /* Health Component delegates */
 // Telling player about his death
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature)
-// Call on heath change then player can print health on event but every tick
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float)
+// Call on heath change then player can print health UI on event but every tick
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, float)
 
 /**
  * Using in Weapon Component

@@ -92,7 +92,7 @@ private:
     // Event for playing death animation
     void OnDeath();
     // Health changed event
-    void OnHealthChanged(float Health) const;
+    void OnHealthChanged(const float Health, const float Delta) const;
     // Subscription for landing delegate
     UFUNCTION()
     void OnGroundLanded(const FHitResult& Hit);

@@ -66,6 +66,9 @@ protected:
             EditCondition = "AutoHeal"))
     float HealModifier = 5.0f;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    TSubclassOf<UCameraShakeBase> CameraShake;
+
     // Called when the game starts
     virtual void BeginPlay() override;
 
@@ -86,7 +89,10 @@ private:
                          const class UDamageType* DamageType,
                          class AController* InstigatedBy,
                          AActor* DamageCauser);
-                         
+
     // Updates health on Heal Modifier delta and stops timer then necessary 
     void HealUpdate();
+
+    // Damage player camera shake effect 
+    void PlayCameraShake() const;
 };

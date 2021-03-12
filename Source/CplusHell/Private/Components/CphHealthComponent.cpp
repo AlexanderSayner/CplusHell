@@ -51,10 +51,11 @@ void UCphHealthComponent::BeginPlay()
 // Set and translate to delegate
 void UCphHealthComponent::SetHealth(const float NewHealth)
 {
+    const float OldHealth = Health;
     // Health could not be less than 0 and more than available, if damage or heal is too big
     Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
     // Print health changing
-    OnHealthChanged.Broadcast(Health);
+    OnHealthChanged.Broadcast(Health, Health - OldHealth);
 }
 
 // Deals damage and starts healing
@@ -89,6 +90,8 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
                                                true,
                                                HealDelay);
     }
+
+    PlayCameraShake();
 }
 
 // Updates health on Heal Modifier delta and stops timer then necessary 
@@ -101,4 +104,18 @@ void UCphHealthComponent::HealUpdate()
     {
         GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
     }
+}
+
+// Damage player camera shake effect
+void UCphHealthComponent::PlayCameraShake() const
+{
+    if (!IsAlive()) return;
+
+    APawn* Player = Cast<APawn>(GetOwner());
+    if (!Player) return;
+
+    APlayerController* Controller = Player->GetController<APlayerController>();
+    if (!Controller || !Controller->PlayerCameraManager) return;
+
+    Controller->PlayerCameraManager->StartCameraShake(CameraShake);
 }

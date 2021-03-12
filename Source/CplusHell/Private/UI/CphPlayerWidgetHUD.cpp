@@ -49,6 +49,18 @@ bool UCphPlayerWidgetHUD::IsPlayerSpectating() const
     return Controller && Controller->GetStateName() == NAME_Spectating;
 }
 
+// Init delegate for red screen effect on damage
+bool UCphPlayerWidgetHUD::Initialize()
+{
+    UCphHealthComponent* HealthComponent = GetHealthComponent();
+    if (HealthComponent)
+    {
+        HealthComponent->OnHealthChanged.AddUObject(
+            this, &UCphPlayerWidgetHUD::OnHealthChanged);
+    }
+    return Super::Initialize();
+}
+
 // Returns nullptr if fails
 UCphWeaponComponent* UCphPlayerWidgetHUD::GetWeaponComponent() const
 {
@@ -75,4 +87,13 @@ UCphHealthComponent* UCphPlayerWidgetHUD::GetHealthComponent() const
     UCphHealthComponent* HealthComponent = Cast<UCphHealthComponent>(Component);
 
     return HealthComponent;
+}
+
+// Delegate subscriber for red screen UI animation
+void UCphPlayerWidgetHUD::OnHealthChanged(float Health, const float Delta)
+{
+    if (Delta < 0.0f)
+    {
+        OnTakeDamage();
+    }
 }
