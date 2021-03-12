@@ -55,3 +55,8 @@ Declaration rules
 * UFUNCTION
 * Casual functions
 
+Commit messages should contain only Latin symbols and numbers. Punctuation marks are not allowed. Every word in commit message should begin with upper case letter. Only upper case commit messages are inappropriate. 
+
+Before commit you must be sure that project hasn't got any build errors and packaging is fine.
+
+Any warnings in console are not welcome.  

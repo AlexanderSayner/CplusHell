@@ -5,6 +5,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogCphLauncherWeapon, All, All)
+
 void ACphLauncherWeapon::StartFire()
 {
     MakeShot();
@@ -40,5 +42,9 @@ void ACphLauncherWeapon::MakeShot()
     }
 
     DecreaseAmmo();
-    SpawnMuzzleFX();
+    if (!SpawnMuzzleFX())
+    {
+        UE_LOG(LogCphLauncherWeapon, Warning,
+               TEXT("Could not spawn launcher muzzle effect"))
+    }
 }

@@ -30,7 +30,7 @@ void ACphBaseWeapon::StopFire()
 {
 }
 
-// Do specific logic for each weapon
+// Implement specific logic for each weapon
 void ACphBaseWeapon::MakeShot()
 {
 }

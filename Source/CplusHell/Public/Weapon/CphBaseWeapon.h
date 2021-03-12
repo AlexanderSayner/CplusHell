@@ -70,7 +70,7 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    // Do specific logic for each weapon
+    // Implement specific logic for each weapon
     virtual void MakeShot();
 
     // Shot trace

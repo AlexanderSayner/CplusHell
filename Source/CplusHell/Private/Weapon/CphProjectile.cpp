@@ -79,13 +79,13 @@ void ACphProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent,
                                         DoFullDamage);
 
     // Visualisation of damage sphere
-    DrawDebugSphere(GetWorld(),
+    /*DrawDebugSphere(GetWorld(),
                     GetActorLocation(),
                     DamageRadius,
                     32,
                     FColor::Red,
                     false,
-                    5.0f);
+                    5.0f);*/
 
     // Visual effect
     WeaponComponentFX->PlayImpactFX(Hit);

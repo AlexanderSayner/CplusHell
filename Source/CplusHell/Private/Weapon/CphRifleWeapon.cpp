@@ -6,6 +6,7 @@
 #include "DrawDebugHelpers.h"
 #include "Weapon/Components/CphWeaponComponentFX.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Construct VFX
 ACphRifleWeapon::ACphRifleWeapon()
@@ -41,7 +42,7 @@ void ACphRifleWeapon::BeginPlay()
 //
 void ACphRifleWeapon::MakeShot()
 {
-    if (!GetWorld() || IsAmmoEmpty())
+    if (!GetWorld() || IsClipEmpty())
     {
         StopFire();
         return;
@@ -57,6 +58,7 @@ void ACphRifleWeapon::MakeShot()
     FHitResult HitResult;
     MakeHit(HitResult, TraceStart, TraceEnd);
 
+    FVector TraceFXEnd = TraceEnd;
     // If got
     if (HitResult.bBlockingHit)
     {
@@ -67,15 +69,12 @@ void ACphRifleWeapon::MakeShot()
                       FColor::Red, false, 3.0f, 0, 3.0f);
         DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
                         FColor::Red, false, 5.0f); */
+        TraceFXEnd = HitResult.ImpactPoint;
         MakeDamage(HitResult);
         WeaponComponentFX->PlayImpactFX(HitResult);
     }
-    else
-    {
-        DrawDebugLine(GetWorld(),
-                      GetMuzzleWorldLocation(), TraceEnd,
-                      FColor::Green, false, 3.0f, 0, 3.0f);
-    }
+
+    SpawnTraceFx(GetMuzzleWorldLocation(), TraceFXEnd);
 
     DecreaseAmmo();
 }
@@ -123,5 +122,19 @@ void ACphRifleWeapon::SetMuzzleFXVisibility(const bool Visibility) const
     {
         MuzzleFXComponent->SetPaused(!Visibility);
         MuzzleFXComponent->SetVisibility(Visibility, true);
+    }
+}
+
+// Bullet trace
+void ACphRifleWeapon::SpawnTraceFx(const FVector& TraceStart,
+                                   const FVector& TraceEnd) const
+{
+    UNiagaraComponent* TraceFXComponent =
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(), TraceFX, TraceStart);
+
+    if (TraceFXComponent)
+    {
+        TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
     }
 }

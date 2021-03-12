@@ -39,6 +39,14 @@ protected:
     UPROPERTY(VisibleAnywhere, Category="VFX")
     UCphWeaponComponentFX* WeaponComponentFX;
 
+    // Trace effect
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    UNiagaraSystem* TraceFX;
+
+    // User param in niagara system 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    FString TraceTargetName = "TraceTarget";
+
     //
     virtual void BeginPlay() override;
 
@@ -60,4 +68,7 @@ private:
     // Niagara effect
     void InitMuzzleFX();
     void SetMuzzleFXVisibility(const bool Visibility) const;
+
+    // Bullet trace
+    void SpawnTraceFx(const FVector& TraceStart, const FVector& TraceEnd) const;
 };
