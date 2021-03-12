@@ -64,6 +64,7 @@ void ACphBaseCharacter::BeginPlay()
     check(HealthComponent)
     check(HealthTextComponent)
     check(GetCharacterMovement())
+    check(GetMesh())
 
     // Init health before delegate declaration
     OnHealthChanged(HealthComponent->GetHealth());
@@ -189,8 +190,7 @@ void ACphBaseCharacter::OnDeath()
 {
     UE_LOG(LogBaseCharacter, Display, TEXT("Oh no, player %s is dead"),
            *GetName())
-    // Play animation montage
-    PlayAnimMontage(DeathAminMontage);
+
     // Player can not move after death
     GetCharacterMovement()->DisableMovement();
     // Span after some seconds
@@ -204,6 +204,10 @@ void ACphBaseCharacter::OnDeath()
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
     // Stop firing
     WeaponComponent->StopFire();
+
+    // Rag doll physics
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    GetMesh()->SetSimulatePhysics(true);
 }
 
 // Health changed event
