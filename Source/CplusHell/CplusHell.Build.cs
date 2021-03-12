@@ -15,7 +15,9 @@ public class CplusHell : ModuleRules
 			"Engine",
 			"InputCore",
 			"Niagara",
-			"PhysicsCore"
+			"PhysicsCore",
+			"GameplayTasks",
+			"NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

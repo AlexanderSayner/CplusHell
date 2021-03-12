@@ -18,7 +18,7 @@ class UCphWeaponComponent;
  * My main awesome character
  */
 UCLASS()
-class CPLUSHELL_API ACphBaseCharacter final : public ACharacter
+class CPLUSHELL_API ACphBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
 
