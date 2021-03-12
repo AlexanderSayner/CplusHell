@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/CphWeaponComponentFX.h"
 #include "Weapon/CphBaseWeapon.h"
 #include "CphRifleWeapon.generated.h"
 
+class UCphWeaponComponentFX;
+class UNiagaraComponent;
 /**
  * Rifle unique logic
  */
@@ -18,7 +19,7 @@ class CPLUSHELL_API ACphRifleWeapon final : public ACphBaseWeapon
 
 public:
     ACphRifleWeapon();
-    
+
     virtual void StartFire() override;
     virtual void StopFire() override;
 
@@ -40,7 +41,7 @@ protected:
 
     //
     virtual void BeginPlay() override;
-    
+
     virtual void MakeShot() override;
     // Returns false when fails
     virtual bool GetTraceData(FVector& TraceStart,
@@ -50,6 +51,13 @@ private:
     // Rifle shot rate control
     FTimerHandle ShotTimerHandle;
 
+    UPROPERTY()
+    UNiagaraComponent* MuzzleFXComponent;
+
     // Deal damage to hit actor
     void MakeDamage(const FHitResult& HitResult) const;
+
+    // Niagara effect
+    void InitMuzzleFX();
+    void SetMuzzleFXVisibility(const bool Visibility) const;
 };

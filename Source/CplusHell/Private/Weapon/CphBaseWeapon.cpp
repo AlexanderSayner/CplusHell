@@ -4,6 +4,7 @@
 #include "Weapon/CphBaseWeapon.h"
 
 #include "DrawDebugHelpers.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "Player/CphBaseCharacter.h"
 
@@ -147,6 +148,14 @@ bool ACphBaseWeapon::IsAmmoFull() const
     // Player starts with empty clip, then reload
     return CurrentAmmo.BulletsInTotal + CurrentAmmo.BulletsInClip ==
            DefaultAmmo.BulletsInTotal;
+}
+
+//
+UNiagaraComponent* ACphBaseWeapon::SpawnMuzzleFX() const
+{
+    return UNiagaraFunctionLibrary::SpawnSystemAttached(
+        MuzzleFX, WeaponMesh, MuzzleSocketName, FVector::ZeroVector,
+        FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
 }
 
 // Called on end of animation. Set defaults bullets, but reduce current ammo clip by 1

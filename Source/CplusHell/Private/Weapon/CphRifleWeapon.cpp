@@ -4,6 +4,8 @@
 #include "Weapon/CphRifleWeapon.h"
 
 #include "DrawDebugHelpers.h"
+#include "Weapon/Components/CphWeaponComponentFX.h"
+#include "NiagaraComponent.h"
 
 // Construct VFX
 ACphRifleWeapon::ACphRifleWeapon()
@@ -15,6 +17,7 @@ ACphRifleWeapon::ACphRifleWeapon()
 //
 void ACphRifleWeapon::StartFire()
 {
+    InitMuzzleFX();
     GetWorldTimerManager().SetTimer(ShotTimerHandle, this,
                                     &ACphRifleWeapon::MakeShot, ShotRate, true);
     MakeShot();
@@ -24,6 +27,7 @@ void ACphRifleWeapon::StartFire()
 void ACphRifleWeapon::StopFire()
 {
     GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+    SetMuzzleFXVisibility(false);
 }
 
 //
@@ -100,4 +104,24 @@ void ACphRifleWeapon::MakeDamage(const FHitResult& HitResult) const
     DamagedActor->TakeDamage(DamageAmount, FDamageEvent(),
                              GetPlayerController(),
                              GetOwner());
+}
+
+//
+void ACphRifleWeapon::InitMuzzleFX()
+{
+    if (!MuzzleFXComponent)
+    {
+        MuzzleFXComponent = SpawnMuzzleFX();
+    }
+    SetMuzzleFXVisibility(true);
+}
+
+//
+void ACphRifleWeapon::SetMuzzleFXVisibility(const bool Visibility) const
+{
+    if (MuzzleFXComponent)
+    {
+        MuzzleFXComponent->SetPaused(!Visibility);
+        MuzzleFXComponent->SetVisibility(Visibility, true);
+    }
 }

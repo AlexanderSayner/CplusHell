@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "CphCoreTypes.h"
+#include "NiagaraComponentPool.h"
 #include "GameFramework/Actor.h"
 #include "CphBaseWeapon.generated.h"
 
@@ -61,6 +62,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="UI")
     FWeaponDataUI UIData;
 
+    // Shooting muzzle fire effect
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    // ReSharper disable once UnrealHeaderToolParserError
+    UNiagaraSystem* MuzzleFX;
+
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
@@ -88,6 +94,8 @@ protected:
     bool IsClipEmpty() const;
     // Compare default ammo with current
     bool IsAmmoFull() const;
+    //
+    UNiagaraComponent* SpawnMuzzleFX() const;
 
 private:
     // Initialised in Begin Play

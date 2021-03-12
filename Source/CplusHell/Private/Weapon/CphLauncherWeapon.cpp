@@ -40,4 +40,5 @@ void ACphLauncherWeapon::MakeShot()
     }
 
     DecreaseAmmo();
+    SpawnMuzzleFX();
 }
