@@ -18,14 +18,21 @@ class CPLUSHELL_API ACphControllerAI final : public AAIController
 
 public:
     ACphControllerAI();
-    
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
     UCphAIPerceptionComponent* AIPerceptionComponent;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
+    FName FocusOnKeyName = "EnemyActor";
+
     virtual void OnPossess(APawn* InPawn) override;
-    
+
 public:
     // Detect closest enemy and turn controller on him
     virtual void Tick(float DeltaTime) override;
+
+private:
+    // Return actor that has to be in focus
+    AActor* GetFocusOnActor();
 };

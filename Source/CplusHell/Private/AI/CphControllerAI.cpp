@@ -5,6 +5,7 @@
 
 #include "Components/CphAIPerceptionComponent.h"
 #include "AI/CphCharacterAI.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ACphControllerAI::ACphControllerAI()
 {
@@ -29,6 +30,14 @@ void ACphControllerAI::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    AActor* AimActor = AIPerceptionComponent->GetClosestEnemy();
+    AActor* AimActor = GetFocusOnActor();
     SetFocus(AimActor);
+}
+
+// Return actor that has to be in focus
+AActor* ACphControllerAI::GetFocusOnActor()
+{
+    if (!GetBlackboardComponent()) return nullptr;
+    return Cast<AActor>(
+        GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }
