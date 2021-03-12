@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "CphCoreTypes.h"
 #include "Components/ActorComponent.h"
 #include "CphWeaponComponentFX.generated.h"
 
@@ -19,19 +20,18 @@ public:
     // Sets default values for this component's properties
     UCphWeaponComponentFX();
 
-    // Spawn effect
+    // Spawn niagara effect first, then decal
     void PlayImpactFX(const FHitResult& Hit);
 
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
-    // ReSharper disable once UnrealHeaderToolParserError
-    UNiagaraSystem* DefaultEffect;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FImpactData DefaultImpactData;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
-    TMap<UPhysicalMaterial*, UNiagaraSystem*> EffectsMap;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    TMap<UPhysicalMaterial*, FImpactData> ImpactDataMap;
 
 public:
     // Called every frame

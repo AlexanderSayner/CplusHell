@@ -3,6 +3,8 @@
 
 #include "Weapon/Components/CphWeaponComponentFX.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/DecalComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UCphWeaponComponentFX::UCphWeaponComponentFX()
@@ -14,25 +16,40 @@ UCphWeaponComponentFX::UCphWeaponComponentFX()
     // ...
 }
 
-// Spawn effect
+// Spawn niagara effect first, then decal
 void UCphWeaponComponentFX::PlayImpactFX(const FHitResult& Hit)
 {
-    UNiagaraSystem* Effect = DefaultEffect;
+    FImpactData ImpactData = DefaultImpactData;
 
     // Playing effect depends on physical material where bullet goes
     if (Hit.PhysMaterial.IsValid())
     {
         const UPhysicalMaterial* PhysMat = Hit.PhysMaterial.Get();
-        if (EffectsMap.Contains(PhysMat))
+        if (ImpactDataMap.Contains(PhysMat))
         {
-            Effect = EffectsMap[PhysMat];
+            ImpactData = ImpactDataMap[PhysMat];
         }
     }
 
     // World context, Niagara System, Location in world, Orientation in world
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-        GetWorld(), Effect, Hit.ImpactPoint,
+        GetWorld(), ImpactData.NiagaraSystem, Hit.ImpactPoint,
         Hit.ImpactNormal.Rotation());
+
+    // Decal
+    UDecalComponent* DecalComponent = UGameplayStatics::SpawnDecalAtLocation(
+        GetWorld(),
+        ImpactData.DecalData.
+                   MaterialInterface,
+        ImpactData.DecalData.Size,
+        Hit.ImpactPoint,
+        Hit.ImpactNormal.Rotation());
+
+    if (DecalComponent)
+    {
+        DecalComponent->SetFadeOut(ImpactData.DecalData.LifeTime,
+                                   ImpactData.DecalData.FadeOutTime);
+    }
 }
 
 

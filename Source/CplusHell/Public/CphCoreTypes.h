@@ -2,6 +2,7 @@
 
 #include "CphCoreTypes.generated.h"
 
+class UNiagaraSystem;
 class ACphBaseWeapon;
 
 /* Health Component delegates */
@@ -66,4 +67,41 @@ struct FWeaponDataUI
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     UTexture2D* CrossHairIcon;
+};
+
+/**
+ * Decal settings
+ */
+USTRUCT(BlueprintType)
+struct FDecalData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    UMaterialInterface* MaterialInterface;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    FVector Size = FVector(10.0f);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    float LifeTime = 5.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    float FadeOutTime = 0.7f;
+};
+
+/**
+ * Niagara and decal union
+ */
+USTRUCT(BlueprintType)
+struct FImpactData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    // ReSharper disable once UnrealHeaderToolParserError
+    UNiagaraSystem* NiagaraSystem;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FDecalData DecalData;
 };
