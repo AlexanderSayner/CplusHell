@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "CphControllerAI.generated.h"
 
+class UCphAIPerceptionComponent;
+
 /**
  * AI behaviour 
  */
@@ -14,6 +16,16 @@ class CPLUSHELL_API ACphControllerAI final : public AAIController
 {
     GENERATED_BODY()
 
+public:
+    ACphControllerAI();
+    
 protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+    UCphAIPerceptionComponent* AIPerceptionComponent;
+
     virtual void OnPossess(APawn* InPawn) override;
+    
+public:
+    // Detect closest enemy and turn controller on him
+    virtual void Tick(float DeltaTime) override;
 };
