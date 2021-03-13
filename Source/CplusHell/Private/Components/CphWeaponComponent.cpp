@@ -107,6 +107,19 @@ bool UCphWeaponComponent::TryToAddAmmo(
     return false;
 }
 
+// AI using for getting ready to reload
+bool UCphWeaponComponent::NeedAmmo(const TSubclassOf<ACphBaseWeapon> WeaponType)
+{
+    for (ACphBaseWeapon* Weapon : Weapons)
+    {
+        if (Weapon && Weapon->IsA(WeaponType))
+        {
+            return !Weapon->IsAmmoFull();
+        }
+    }
+    return false;
+}
+
 
 // Called when the game starts
 void UCphWeaponComponent::BeginPlay()

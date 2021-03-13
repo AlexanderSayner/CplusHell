@@ -39,6 +39,9 @@ public:
     bool TryToAddAmmo(const TSubclassOf<ACphBaseWeapon> WeaponType,
                       const int32 BulletsAmount);
 
+    // AI using for getting ready to reload
+    bool NeedAmmo(const TSubclassOf<ACphBaseWeapon> WeaponType);
+
 protected:
     // Custom weapon class
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")

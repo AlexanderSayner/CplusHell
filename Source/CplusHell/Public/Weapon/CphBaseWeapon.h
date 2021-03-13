@@ -36,6 +36,8 @@ public:
     bool CanReload() const;
     // Is bullets ended in clip and also in stock
     bool IsAmmoEmpty() const;
+    // Compare default ammo with current
+    bool IsAmmoFull() const;
 
     // Getters
     FWeaponDataUI GetUIData() const { return UIData; }
@@ -92,8 +94,6 @@ protected:
     void DecreaseAmmo();
     // Set defaults bullets, bul reduce current ammo clip by 1
     bool IsClipEmpty() const;
-    // Compare default ammo with current
-    bool IsAmmoFull() const;
     //
     UNiagaraComponent* SpawnMuzzleFX() const;
 

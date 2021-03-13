@@ -35,10 +35,15 @@ public:
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
     // Called every frame
     virtual void Tick(float DeltaTime) override;
+    // Could not be taken if invisible, using by AI
+    bool CouldBeTaken() const;
 
 private:
     // Starting animation yaw
     float RotationYaw = 0.0f;
+
+    // Respawn for pickup 
+    FTimerHandle RespawnTimerHandle;
 
     // Make bonus invisible
     void PickupWasTaken();

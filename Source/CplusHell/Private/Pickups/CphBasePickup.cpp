@@ -60,6 +60,12 @@ void ACphBasePickup::Tick(const float DeltaTime)
     AddActorLocalRotation(FRotator(0.0f, RotationYaw, 0.0f));
 }
 
+// Could not be taken if invisible, using by AI
+bool ACphBasePickup::CouldBeTaken() const
+{
+    return !GetWorldTimerManager().IsTimerActive(RespawnTimerHandle);
+}
+
 // Make bonus invisible
 void ACphBasePickup::PickupWasTaken()
 {
@@ -67,13 +73,12 @@ void ACphBasePickup::PickupWasTaken()
     GetRootComponent()->SetVisibility(false, true);
     UE_LOG(LogBasePickup, Display, TEXT("Setted visibility to false"))
 
-    FTimerHandle RespawnTimerHandle;
     GetWorldTimerManager().SetTimer(RespawnTimerHandle, this,
                                     &ACphBasePickup::Respawn, RespawnTime);
 }
 
 // Make visible
-void ACphBasePickup::Respawn() 
+void ACphBasePickup::Respawn()
 {
     GenerateRotationYaw();
     CollisionComponent->SetCollisionResponseToAllChannels(ECR_Overlap);

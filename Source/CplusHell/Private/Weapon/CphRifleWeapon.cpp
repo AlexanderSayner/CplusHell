@@ -44,6 +44,10 @@ void ACphRifleWeapon::MakeShot()
 {
     if (!GetWorld() || IsClipEmpty())
     {
+        if (!IsAmmoEmpty())
+        {
+            OnClipEmpty.Broadcast();
+        }
         StopFire();
         return;
     }
