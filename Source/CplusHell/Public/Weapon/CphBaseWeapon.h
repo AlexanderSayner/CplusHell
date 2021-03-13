@@ -34,6 +34,8 @@ public:
     void ChangeClip();
     // Asks, before animation started to play
     bool CanReload() const;
+    // Is bullets ended in clip and also in stock
+    bool IsAmmoEmpty() const;
 
     // Getters
     FWeaponDataUI GetUIData() const { return UIData; }
@@ -88,8 +90,6 @@ protected:
                  const FVector& TraceStart, const FVector& TraceEnd) const;
     // Changing current ammo count 
     void DecreaseAmmo();
-    // Is bullets ended in clip and also in stock
-    bool IsAmmoEmpty() const;
     // Set defaults bullets, bul reduce current ammo clip by 1
     bool IsClipEmpty() const;
     // Compare default ammo with current

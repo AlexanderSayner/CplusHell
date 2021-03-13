@@ -26,6 +26,9 @@ public:
     // Constructor
     // Sets default values for this character's properties
     explicit ACphBaseCharacter(const FObjectInitializer& ObjInit);
+    
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 protected:
     // Smart camera controller
@@ -55,8 +58,9 @@ protected:
     // Landed damage interval
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(1, 10000);
-    // Called when the game starts or when spawned
-    virtual void BeginPlay() override;
+    
+    // Event for playing death animation
+    virtual void OnDeath();
 
 public:
     // Called every frame
@@ -89,8 +93,6 @@ private:
     void OnStartSprinting();
     // Released acceleration key
     void OnStopSprinting();
-    // Event for playing death animation
-    void OnDeath();
     // Health changed event
     void OnHealthChanged(const float Health, const float Delta) const;
     // Subscription for landing delegate

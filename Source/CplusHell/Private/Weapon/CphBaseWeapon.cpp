@@ -64,10 +64,22 @@ APlayerController* ACphBaseWeapon::GetPlayerController() const
 bool ACphBaseWeapon::GetPlayerViewPoint(FVector& ViewLocation,
                                         FRotator& ViewRotation) const
 {
-    const APlayerController* Controller = GetPlayerController();
-    if (!Controller) return false;
+    ACharacter* Character = Cast<ACharacter>(GetOwner());
+    if (!Character) return false;
 
-    Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    if (Character->IsPlayerControlled()) // if controlled by player
+    {
+        const APlayerController* PlayerController = GetPlayerController();
+        if (!PlayerController) return false;
+
+        PlayerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    }
+    else // if controlled by AI
+    {
+        ViewLocation = GetMuzzleWorldLocation();
+        ViewRotation = WeaponMesh->GetSocketRotation(MuzzleSocketName);
+    }
+
     return true;
 }
 

@@ -12,21 +12,23 @@
  * Ability for weapon changing
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class CPLUSHELL_API UCphWeaponComponent final : public UActorComponent
+class CPLUSHELL_API UCphWeaponComponent : public UActorComponent
 {
     GENERATED_BODY()
 
 public:
     // Sets default values for this component's properties
     UCphWeaponComponent();
+    // Called when the game starts
+    virtual void BeginPlay() override;
     // Destroy player weapons
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     // Fire on player action. Can not be const, because of using in BindAction
-    void StartFire();
+    virtual void StartFire();
     // On mouse button release. Can not be const, because of using in BindAction
     void StopFire();
     // Circle choosing weapon
-    void NextWeapon();
+    virtual void NextWeapon();
     // Reload action mapping
     void Reload();
     // Returns true if weapon valid and ui set successfully.
@@ -40,22 +42,22 @@ public:
 protected:
     // Custom weapon class
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+
     // TArray<TSubclassOf<ACphBaseWeapon>> WeaponClasses;
     TArray<FWeaponData> WeaponData;
+
     // Right hand socket
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponEquipSocketName = "WeaponPoint";
+
     // Addition weapon socket
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponArmorySocketName = "ArmorySocket";
+
     // Weapon component field in BP_PlayerCharacter
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* EquipAnimMontage;
 
-    // Called when the game starts
-    virtual void BeginPlay() override;
-
-private:
     // Set a weapon than player hold in his hands
     UPROPERTY()
     ACphBaseWeapon* CurrentWeapon = nullptr;
@@ -64,12 +66,21 @@ private:
     UPROPERTY()
     TArray<ACphBaseWeapon*> Weapons;
 
+    // Default weapon in game begin 
+    int32 CurrentWeaponIndex = 0;
+
+    // Solution for non stop weapon changing
+    bool CanFire() const;
+    bool CanEquip() const;
+
+    // Set Current weapon, attach to character's hand
+    void EquipWeapon(int32 WeaponIndex);
+
+private:
     // Different weapons - different animation
     UPROPERTY()
     UAnimMontage* CurrentReloadAnimMontage = nullptr;
 
-    // Default weapon in game begin 
-    int32 CurrentWeaponIndex = 0;
     bool EquipAnimInProgress = false;
     bool ReloadAnimInProgress = false;
 
@@ -79,8 +90,6 @@ private:
     static void AttachWeaponToSocket(ACphBaseWeapon* Weapon,
                                      ACharacter* Character,
                                      const FName& Name);
-    // Set Current weapon, attach to character's hand
-    void EquipWeapon(int32 WeaponIndex);
     // Initialisation
     void SpawnWeapons();
 
@@ -93,9 +102,7 @@ private:
     // Changing clip here, only when reload animation is finished
     void OnReloadFinished(USkeletalMeshComponent* MeshComponent);
 
-    // Solution for non stop weapon changing
-    bool CanFire() const;
-    bool CanEquip() const;
+    // Checking reload and equip animation progress
     bool CanReload() const;
 
     // Call by delegate FOnClipEmptySignature in Base Weapon 
