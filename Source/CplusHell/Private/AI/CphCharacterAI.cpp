@@ -13,7 +13,7 @@ ACphCharacterAI::ACphCharacterAI(const FObjectInitializer& ObjectInitializer)
         ObjectInitializer.SetDefaultSubobjectClass<UCphWeaponAIComponent>(
             "WeaponComponent"))
 {
-    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    AutoPossessAI = EAutoPossessAI::Disabled;
     AIControllerClass = ACphControllerAI::StaticClass();
 
     bUseControllerRotationYaw = false;

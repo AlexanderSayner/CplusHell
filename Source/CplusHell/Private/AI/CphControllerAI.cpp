@@ -12,6 +12,8 @@ ACphControllerAI::ACphControllerAI()
     AIPerceptionComponent = CreateDefaultSubobject<UCphAIPerceptionComponent>(
         "CphAIPerceptionComponent");
     SetPerceptionComponent(*AIPerceptionComponent);
+
+    bWantsPlayerState = true;
 }
 
 void ACphControllerAI::OnPossess(APawn* InPawn)

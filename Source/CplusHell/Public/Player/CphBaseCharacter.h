@@ -26,9 +26,27 @@ public:
     // Constructor
     // Sets default values for this character's properties
     explicit ACphBaseCharacter(const FObjectInitializer& ObjInit);
-    
+
+
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
+
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(
+        class UInputComponent* PlayerInputComponent) override;
+
+    // Tell for blueprint, if character is sprinting
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    bool IsSprinting() const;
+
+    // Tell for blueprint, there player looks
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetMovementDirection() const;
+
+    // Called by Game Mode Base, sets color for player mesh material
+    void SetPlayerColor(const FLinearColor& Color) const;
 
 protected:
     // Smart camera controller
@@ -58,25 +76,12 @@ protected:
     // Landed damage interval
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(1, 10000);
-    
+    // Variable name for mesh material color
+    UPROPERTY(EditDefaultsOnly, Category="Material")
+    FName MaterialColorName = "Paint Color";
+
     // Event for playing death animation
     virtual void OnDeath();
-
-public:
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
-
-    // Called to bind functionality to input
-    virtual void SetupPlayerInputComponent(
-        class UInputComponent* PlayerInputComponent) override;
-
-    // Tell for blueprint, if character is sprinting
-    UFUNCTION(BlueprintCallable, Category = "Movement")
-    bool IsSprinting() const;
-
-    // Tell for blueprint, there player looks
-    UFUNCTION(BlueprintCallable, Category = "Movement")
-    float GetMovementDirection() const;
 
 private:
     // Variables

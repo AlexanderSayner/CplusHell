@@ -81,7 +81,7 @@ protected:
     virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
 
     // Returns nullptr if fails
-    APlayerController* GetPlayerController() const;
+    APlayerController* GetPlayerController() const; //(could be simplified)
     // Returns false on fail
     bool GetPlayerViewPoint(FVector& ViewLocation,
                             FRotator& ViewRotation) const;

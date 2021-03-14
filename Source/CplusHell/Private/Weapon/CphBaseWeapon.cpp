@@ -193,7 +193,6 @@ void ACphBaseWeapon::ChangeClip()
     {
         CurrentAmmo.BulletsInClip = DefaultAmmo.BulletsInClip;
     }
-    UE_LOG(LogCphBaseWeapon, Display, TEXT("Changed clip"))
 }
 
 // Asks, before animation started to play

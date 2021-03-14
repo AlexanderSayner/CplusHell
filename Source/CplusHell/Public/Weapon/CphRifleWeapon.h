@@ -71,4 +71,7 @@ private:
 
     // Bullet trace
     void SpawnTraceFx(const FVector& TraceStart, const FVector& TraceEnd) const;
+
+    //
+    AController*GetController() const;
 };

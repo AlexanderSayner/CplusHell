@@ -105,7 +105,7 @@ void ACphRifleWeapon::MakeDamage(const FHitResult& HitResult) const
     AActor* DamagedActor = HitResult.GetActor();
     if (!DamagedActor) return;
     DamagedActor->TakeDamage(DamageAmount, FDamageEvent(),
-                             GetPlayerController(),
+                             GetController(),
                              GetOwner());
 }
 
@@ -141,4 +141,10 @@ void ACphRifleWeapon::SpawnTraceFx(const FVector& TraceStart,
     {
         TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
     }
+}
+
+AController* ACphRifleWeapon::GetController() const
+{
+    APawn* Pawn = Cast<APawn>(GetOwner());
+    return Pawn ? Pawn->GetController() : nullptr;
 }

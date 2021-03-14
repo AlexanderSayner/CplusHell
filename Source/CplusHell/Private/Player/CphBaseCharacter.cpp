@@ -68,12 +68,12 @@ void ACphBaseCharacter::BeginPlay()
 
     // Init health before delegate declaration
     OnHealthChanged(HealthComponent->GetHealth(), 0.0f);
-    
+
     HealthComponent->OnDeath
                    .AddUObject(this, &ACphBaseCharacter::OnDeath);
     HealthComponent->OnHealthChanged
                    .AddUObject(this, &ACphBaseCharacter::OnHealthChanged);
-    
+
     // Subscribe for landing
     LandedDelegate.AddDynamic(this, &ACphBaseCharacter::OnGroundLanded);
 }
@@ -154,6 +154,16 @@ float ACphBaseCharacter::GetMovementDirection() const
     const float AngleBetweenDegrees = FMath::RadiansToDegrees(AngleBetween);
     // If Z < 0, then multiply -1, otherwise 1
     return AngleBetweenDegrees * FMath::Sign(CrossProduct.Z);
+}
+
+// Called by Game Mode Base, sets color for player mesh material
+void ACphBaseCharacter::SetPlayerColor(const FLinearColor& Color) const
+{
+    UMaterialInstanceDynamic* MaterialInstance = GetMesh()->
+        CreateAndSetMaterialInstanceDynamic(0);
+    if (!MaterialInstance) return;
+
+    MaterialInstance->SetVectorParameterValue(MaterialColorName, Color);
 }
 
 // Calls then character moves by MoveForward action mapping 

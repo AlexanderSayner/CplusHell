@@ -3,6 +3,8 @@
 
 #include "Components/CphHealthComponent.h"
 
+#include "CphGameModeBase.h"
+
 // Sets default values for this component's properties
 UCphHealthComponent::UCphHealthComponent()
 {
@@ -73,6 +75,7 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
 
     if (!IsAlive())
     {
+        Killed(InstigatedBy);
         OnDeath.Broadcast();
         // Stop healing
         if (GetWorld())
@@ -118,4 +121,17 @@ void UCphHealthComponent::PlayCameraShake() const
     if (!Controller || !Controller->PlayerCameraManager) return;
 
     Controller->PlayerCameraManager->StartCameraShake(CameraShake);
+}
+
+//
+void UCphHealthComponent::Killed(AController* SlayerController) const
+{
+    ACphGameModeBase* GameMode = Cast<ACphGameModeBase>(
+        GetWorld()->GetAuthGameMode());
+    if (!GameMode) return;
+
+    APawn* Player = Cast<APawn>(GetOwner());
+    AController* VictimController = Player ? Player->Controller : nullptr;
+
+    GameMode->Killed(SlayerController, VictimController);
 }

@@ -95,4 +95,6 @@ private:
 
     // Damage player camera shake effect 
     void PlayCameraShake() const;
+
+    void Killed(AController* SlayerController) const;
 };
