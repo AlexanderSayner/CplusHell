@@ -7,6 +7,7 @@
 #include "CphControllerAI.generated.h"
 
 class UCphAIPerceptionComponent;
+class UCphRespawnComponent;
 
 /**
  * AI behaviour 
@@ -22,6 +23,9 @@ public:
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
     UCphAIPerceptionComponent* AIPerceptionComponent;
+
+    UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Components")
+    UCphRespawnComponent* RespawnComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
     FName FocusOnKeyName = "EnemyActor";

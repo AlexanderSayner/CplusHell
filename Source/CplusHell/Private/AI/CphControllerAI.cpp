@@ -4,6 +4,7 @@
 #include "AI/CphControllerAI.h"
 
 #include "Components/CphAIPerceptionComponent.h"
+#include "Components/CphRespawnComponent.h"
 #include "AI/CphCharacterAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -12,6 +13,9 @@ ACphControllerAI::ACphControllerAI()
     AIPerceptionComponent = CreateDefaultSubobject<UCphAIPerceptionComponent>(
         "CphAIPerceptionComponent");
     SetPerceptionComponent(*AIPerceptionComponent);
+
+    RespawnComponent = CreateDefaultSubobject<UCphRespawnComponent>(
+        "RespawnComponent");
 
     bWantsPlayerState = true;
 }

@@ -107,7 +107,7 @@ struct FImpactData
 };
 
 /**
- * Global game settings
+ * Global game settings, time variables in seconds
  */
 USTRUCT(BlueprintType)
 struct FGameData
@@ -124,11 +124,15 @@ struct FGameData
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Game",
         meta=(ClampMin="1", ClampMax="300"))
-    int32 RoundDuration = 3;
+    int32 RoundDuration = 10;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FLinearColor DefaultTeamColor = FLinearColor::Red;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TArray<FLinearColor> TeamColors;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Game",
+        meta=(ClampMin="1", ClampMax="20"))
+    int32 RespawnTime = 5;
 };

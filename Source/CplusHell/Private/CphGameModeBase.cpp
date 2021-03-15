@@ -3,6 +3,9 @@
 
 #include "CphGameModeBase.h"
 
+
+#include "EngineUtils.h"
+#include "Components/CphRespawnComponent.h"
 #include "Player/CphBaseCharacter.h"
 #include "Player/CphPlayerController.h"
 #include "Player/CphPlayerState.h"
@@ -59,6 +62,13 @@ void ACphGameModeBase::Killed(AController* SlayerController,
     {
         VictimPlayerState->AddDeath();
     }
+
+    StartRespawn(VictimController);
+}
+
+void ACphGameModeBase::RespawnRequest(AController* Controller)
+{
+    ResetOnePlayer(Controller);
 }
 
 void ACphGameModeBase::SpawnBots()
@@ -98,15 +108,14 @@ void ACphGameModeBase::GameTimerUpdate()
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
-        if (++CurrentRoundNum <= GameData.RoundsNum)
+        if (++CurrentRoundNum < GameData.RoundsNum)
         {
             ResetPlayers();
             StartRound();
         }
         else
         {
-            UE_LOG(LogCphGameModeBase, Display, TEXT("Game Over"))
-            LogPlayerInfo();
+            GameOver();
         }
     }
 }
@@ -199,5 +208,39 @@ void ACphGameModeBase::LogPlayerInfo() const
         if (!PlayerState) continue;
 
         PlayerState->LogInfo();
+    }
+}
+
+// Calls respawn component than starts respawn timer
+void ACphGameModeBase::StartRespawn(AController* Controller) const
+{
+    // Check if respawn timer should not start
+    const bool RespawnAvailable = RoundCountDown > GameData.RespawnTime;
+    if (!RespawnAvailable) return;
+
+    UActorComponent* RespawnComponentCandidate = Controller->
+        FindComponentByClass(UCphRespawnComponent::StaticClass());
+    UCphRespawnComponent* RespawnComponent = Cast<UCphRespawnComponent>(
+        RespawnComponentCandidate);
+    if (!RespawnComponent) return;
+
+    RespawnComponent->Respawn(GameData.RespawnTime);
+}
+
+//
+void ACphGameModeBase::GameOver()
+{
+    UE_LOG(LogCphGameModeBase, Display, TEXT("Game Over"))
+    LogPlayerInfo();
+
+    for (APawn* Pawn : TActorRange<APawn>(GetWorld()))
+    {
+        if (Pawn)
+        {
+            // Pawn->TurnOff();
+            // Pawn->DisableInput(nullptr);
+            UE_LOG(LogCphGameModeBase, Display, TEXT("Turn off pawn: %s"),
+                   *Pawn->GetName())
+        }
     }
 }
