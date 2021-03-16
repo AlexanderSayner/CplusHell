@@ -108,7 +108,7 @@ void ACphGameModeBase::GameTimerUpdate()
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
 
-        if (++CurrentRoundNum < GameData.RoundsNum)
+        if (++CurrentRoundNum <= GameData.RoundsNum)
         {
             ResetPlayers();
             StartRound();

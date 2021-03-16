@@ -52,11 +52,11 @@ bool UCphPlayerWidgetHUD::IsPlayerSpectating() const
 // Init delegate for red screen effect on damage
 bool UCphPlayerWidgetHUD::Initialize()
 {
-    UCphHealthComponent* HealthComponent = GetHealthComponent();
-    if (HealthComponent)
+    if (GetOwningPlayer())
     {
-        HealthComponent->OnHealthChanged.AddUObject(
-            this, &UCphPlayerWidgetHUD::OnHealthChanged);
+        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(
+            this, &UCphPlayerWidgetHUD::OnNewPawn);
+        OnNewPawn(GetOwningPlayerPawn());
     }
     return Super::Initialize();
 }
@@ -95,5 +95,21 @@ void UCphPlayerWidgetHUD::OnHealthChanged(float Health, const float Delta)
     if (Delta < 0.0f)
     {
         OnTakeDamage();
+    }
+}
+
+// Delegate subscriber initializing OnHealthChanged subscriber for new Pawn
+void UCphPlayerWidgetHUD::OnNewPawn(APawn* NewPawn)
+{
+    if (!NewPawn) return;
+
+    UActorComponent* Component = NewPawn->FindComponentByClass(
+        UCphHealthComponent::StaticClass());
+    UCphHealthComponent* HealthComponent = Cast<UCphHealthComponent>(Component);
+    if (HealthComponent &&
+        !HealthComponent->OnHealthChanged.IsBoundToObject(this))
+    {
+        HealthComponent->OnHealthChanged.AddUObject(
+            this, &UCphPlayerWidgetHUD::OnHealthChanged);
     }
 }

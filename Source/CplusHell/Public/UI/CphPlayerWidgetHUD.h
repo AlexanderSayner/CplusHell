@@ -54,4 +54,6 @@ private:
 
     // Delegate subscriber for red screen UI animation 
     void OnHealthChanged(float Health, float Delta);
+    // Delegate subscriber initializing OnHealthChanged subscriber for new Pawn
+    void OnNewPawn(APawn* NewPawn);
 };
