@@ -3,7 +3,9 @@
 
 #include "Player/CphPlayerCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/CphWeaponComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ACphPlayerCharacter::ACphPlayerCharacter(
@@ -29,6 +31,26 @@ ACphPlayerCharacter::ACphPlayerCharacter(
         "FollowCamera");
     // Attach camera to SpringArm
     FollowCamera->SetupAttachment(SpringArmComponent);
+
+    // Sets character invisible, if camera inside him
+    CameraCollisionComponent = CreateDefaultSubobject<USphereComponent>(
+        "CameraCollisionComponent");
+    CameraCollisionComponent->SetupAttachment(FollowCamera);
+    CameraCollisionComponent->SetSphereRadius(10.0f);
+    CameraCollisionComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
+}
+
+//
+void ACphPlayerCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(CameraCollisionComponent)
+
+    CameraCollisionComponent->OnComponentBeginOverlap.AddDynamic(
+        this, &ACphPlayerCharacter::OnCameraCollisionBeginOverlap);
+    CameraCollisionComponent->OnComponentEndOverlap.AddDynamic(
+        this, &ACphPlayerCharacter::OnCameraCollisionEndOverlap);
 }
 
 //
@@ -116,10 +138,48 @@ void ACphPlayerCharacter::OnStopSprinting()
 }
 
 //
+void ACphPlayerCharacter::OnCameraCollisionBeginOverlap(
+    UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+    const FHitResult& SweepResult) 
+{
+    CheckCameraOverlap();
+}
+
+//
+void ACphPlayerCharacter::OnCameraCollisionEndOverlap(
+    UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
+{
+    CheckCameraOverlap();
+}
+
+// Can't be const because of using like delegate subscriber 
+void ACphPlayerCharacter::CheckCameraOverlap() 
+{
+    const bool HideMesh = CameraCollisionComponent->IsOverlappingComponent(
+        GetCapsuleComponent());
+    GetMesh()->SetOwnerNoSee(HideMesh);
+
+    TArray<USceneComponent*> MeshChildren;
+    GetMesh()->GetChildrenComponents(true, MeshChildren);
+    
+    for (USceneComponent* MeshChild : MeshChildren)
+    {
+        UPrimitiveComponent* MeshChildGeometry = Cast<UPrimitiveComponent>(
+            MeshChild);
+        if (MeshChildGeometry)
+        {
+            MeshChildGeometry->SetOwnerNoSee(HideMesh);
+        }
+    }
+}
+
+//
 void ACphPlayerCharacter::OnDeath()
 {
     Super::OnDeath();
-    
+
     // Turn on spectator
     if (Controller)
     {

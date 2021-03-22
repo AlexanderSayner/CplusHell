@@ -6,8 +6,9 @@
 #include "Player/CphBaseCharacter.h"
 #include "CphPlayerCharacter.generated.h"
 
-class UCameraComponent;
 class USpringArmComponent;
+class UCameraComponent;
+class USphereComponent;
 
 /**
  * Logic than defines player only but AI
@@ -19,6 +20,8 @@ class CPLUSHELL_API ACphPlayerCharacter final : public ACphBaseCharacter
 
 public:
     explicit ACphPlayerCharacter(const FObjectInitializer& ObjectInitializer);
+
+    virtual void BeginPlay() override;
 
     virtual bool IsSprinting() const override;
 
@@ -33,6 +36,9 @@ protected:
     // Getting ful control on camera
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UCameraComponent* FollowCamera;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+    USphereComponent* CameraCollisionComponent;
 
     virtual void OnDeath() override;
 
@@ -51,4 +57,20 @@ private:
     void OnStartSprinting();
     // Released acceleration key
     void OnStopSprinting();
+
+    UFUNCTION()
+    void OnCameraCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+                                       AActor* OtherActor,
+                                       UPrimitiveComponent* OtherComp,
+                                       int32 OtherBodyIndex, bool bFromSweep,
+                                       const FHitResult& SweepResult);
+
+    UFUNCTION()
+    void OnCameraCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+                                     AActor* OtherActor,
+                                     UPrimitiveComponent* OtherComp,
+                                     int32 OtherBodyIndex);
+
+    // Can't be const because of using like delegate subscriber
+    void CheckCameraOverlap();
 };
