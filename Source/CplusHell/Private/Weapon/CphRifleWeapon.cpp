@@ -1,0 +1,150 @@
+// C plus Hell Learning Game, All Right Reserved.
+
+
+#include "Weapon/CphRifleWeapon.h"
+
+#include "DrawDebugHelpers.h"
+#include "Weapon/Components/CphWeaponComponentFX.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
+// Construct VFX
+ACphRifleWeapon::ACphRifleWeapon()
+{
+    WeaponComponentFX = CreateDefaultSubobject<UCphWeaponComponentFX>(
+        "WeaponComponentFX");
+}
+
+//
+void ACphRifleWeapon::StartFire()
+{
+    InitMuzzleFX();
+    GetWorldTimerManager().SetTimer(ShotTimerHandle, this,
+                                    &ACphRifleWeapon::MakeShot, ShotRate, true);
+    MakeShot();
+}
+
+//
+void ACphRifleWeapon::StopFire()
+{
+    GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+    SetMuzzleFXVisibility(false);
+}
+
+//
+void ACphRifleWeapon::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(WeaponComponentFX)
+}
+
+//
+void ACphRifleWeapon::MakeShot()
+{
+    if (!GetWorld() || IsClipEmpty())
+    {
+        if (!IsAmmoEmpty())
+        {
+            OnClipEmpty.Broadcast();
+        }
+        StopFire();
+        return;
+    }
+
+    FVector TraceStart, TraceEnd;
+    if (!GetTraceData(TraceStart, TraceEnd))
+    {
+        StopFire();
+        return;
+    }
+
+    FHitResult HitResult;
+    MakeHit(HitResult, TraceStart, TraceEnd);
+
+    FVector TraceFXEnd = TraceEnd;
+    // If got
+    if (HitResult.bBlockingHit)
+    {
+        /*
+        DrawDebugLine(GetWorld(),
+                      GetMuzzleWorldLocation(),
+                      HitResult.ImpactPoint,
+                      FColor::Red, false, 3.0f, 0, 3.0f);
+        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24,
+                        FColor::Red, false, 5.0f); */
+        TraceFXEnd = HitResult.ImpactPoint;
+        MakeDamage(HitResult);
+        WeaponComponentFX->PlayImpactFX(HitResult);
+    }
+
+    SpawnTraceFx(GetMuzzleWorldLocation(), TraceFXEnd);
+
+    DecreaseAmmo();
+}
+
+// Returns false when fails
+bool ACphRifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+{
+    FVector ViewLocation;
+    FRotator ViewRotation;
+    if (!GetPlayerViewPoint(ViewLocation, ViewRotation)) return false;
+
+    // Draw direction line
+    TraceStart = ViewLocation;
+    const float HalfRad = FMath::DegreesToRadians(BulletSpread);
+    const FVector ShootDirection = FMath::VRandCone(
+        ViewRotation.Vector(), HalfRad);
+    TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    return true;
+}
+
+// Deal damage to hit actor
+void ACphRifleWeapon::MakeDamage(const FHitResult& HitResult) const
+{
+    AActor* DamagedActor = HitResult.GetActor();
+    if (!DamagedActor) return;
+    DamagedActor->TakeDamage(DamageAmount, FDamageEvent(),
+                             GetController(),
+                             GetOwner());
+}
+
+//
+void ACphRifleWeapon::InitMuzzleFX()
+{
+    if (!MuzzleFXComponent)
+    {
+        MuzzleFXComponent = SpawnMuzzleFX();
+    }
+    SetMuzzleFXVisibility(true);
+}
+
+//
+void ACphRifleWeapon::SetMuzzleFXVisibility(const bool Visibility) const
+{
+    if (MuzzleFXComponent)
+    {
+        MuzzleFXComponent->SetPaused(!Visibility);
+        MuzzleFXComponent->SetVisibility(Visibility, true);
+    }
+}
+
+// Bullet trace
+void ACphRifleWeapon::SpawnTraceFx(const FVector& TraceStart,
+                                   const FVector& TraceEnd) const
+{
+    UNiagaraComponent* TraceFXComponent =
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(), TraceFX, TraceStart);
+
+    if (TraceFXComponent)
+    {
+        TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
+    }
+}
+
+AController* ACphRifleWeapon::GetController() const
+{
+    APawn* Pawn = Cast<APawn>(GetOwner());
+    return Pawn ? Pawn->GetController() : nullptr;
+}

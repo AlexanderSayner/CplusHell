@@ -3,6 +3,8 @@
 
 #include "Components/CphHealthComponent.h"
 
+#include "CphGameModeBase.h"
+
 // Sets default values for this component's properties
 UCphHealthComponent::UCphHealthComponent()
 {
@@ -13,12 +15,31 @@ UCphHealthComponent::UCphHealthComponent()
     // ...
 }
 
+// Returns value between zero and one
+float UCphHealthComponent::GetHealthRatio() const
+{
+    return Health / MaxHealth;
+}
+
+// Add some health
+bool UCphHealthComponent::TryToAddHealth(const int32 HealthAmount)
+{
+    if (!IsAlive())
+        return false;
+
+    if (FMath::IsNearlyEqual(Health, MaxHealth, 0.1f))
+        return false;
+
+    SetHealth(Health + HealthAmount);
+    return true;
+}
 
 // Called when the game starts
 void UCphHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+    check(MaxHealth > 0)
     SetHealth(MaxHealth);
 
     AActor* ComponentOwner = GetOwner();
@@ -32,10 +53,11 @@ void UCphHealthComponent::BeginPlay()
 // Set and translate to delegate
 void UCphHealthComponent::SetHealth(const float NewHealth)
 {
+    const float OldHealth = Health;
     // Health could not be less than 0 and more than available, if damage or heal is too big
     Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
     // Print health changing
-    OnHealthChanged.Broadcast(Health);
+    OnHealthChanged.Broadcast(Health, Health - OldHealth);
 }
 
 // Deals damage and starts healing
@@ -53,9 +75,10 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
 
     if (!IsAlive())
     {
+        Killed(InstigatedBy);
         OnDeath.Broadcast();
         // Stop healing
-        if(GetWorld())
+        if (GetWorld())
         {
             GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
         }
@@ -70,6 +93,8 @@ void UCphHealthComponent::OnTakeAnyDamage(AActor* DamagedActor,
                                                true,
                                                HealDelay);
     }
+
+    PlayCameraShake();
 }
 
 // Updates health on Heal Modifier delta and stops timer then necessary 
@@ -82,4 +107,31 @@ void UCphHealthComponent::HealUpdate()
     {
         GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
     }
+}
+
+// Damage player camera shake effect
+void UCphHealthComponent::PlayCameraShake() const
+{
+    if (!IsAlive()) return;
+
+    APawn* Player = Cast<APawn>(GetOwner());
+    if (!Player) return;
+
+    APlayerController* Controller = Player->GetController<APlayerController>();
+    if (!Controller || !Controller->PlayerCameraManager) return;
+
+    Controller->PlayerCameraManager->StartCameraShake(CameraShake);
+}
+
+//
+void UCphHealthComponent::Killed(AController* SlayerController) const
+{
+    ACphGameModeBase* GameMode = Cast<ACphGameModeBase>(
+        GetWorld()->GetAuthGameMode());
+    if (!GameMode) return;
+
+    APawn* Player = Cast<APawn>(GetOwner());
+    AController* VictimController = Player ? Player->Controller : nullptr;
+
+    GameMode->Killed(SlayerController, VictimController);
 }

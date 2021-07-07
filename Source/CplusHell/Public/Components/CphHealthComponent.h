@@ -3,18 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "CphCoreTypes.h"
 #include "Components/ActorComponent.h"
 #include "CphHealthComponent.generated.h"
-
-// Delegate for telling player about his death
-DECLARE_MULTICAST_DELEGATE(FOnDeathSignature)
-// Call on heath change then player can print health on event but every tick
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float)
 
 /**
  * Healing and damage dealing politics
  */
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CPLUSHELL_API UCphHealthComponent final : public UActorComponent
 {
     GENERATED_BODY()
@@ -31,8 +28,15 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Health")
     bool IsAlive() const { return !FMath::IsNearlyZero(Health, 0.5f); }
 
+    // Returns value between zero and one
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    float GetHealthRatio() const;
+
     // Getter
     float GetHealth() const { return Health; }
+
+    // Add some health
+    bool TryToAddHealth(const int32 HealthAmount);
 
 protected:
     // Setting for max health
@@ -46,7 +50,7 @@ protected:
 
     // Time interval of healing in seconds
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
-        meta = (ClampMin = "0.1", ClampMax = "60.0",
+        meta = (ClampMin = "0.01", ClampMax = "60.0",
             EditCondition = "AutoHeal"))
     float HealUpdateTime = 1.0f;
 
@@ -61,6 +65,9 @@ protected:
         meta = (ClampMin = "0.01", ClampMax = "1000.0",
             EditCondition = "AutoHeal"))
     float HealModifier = 5.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="VFX")
+    TSubclassOf<UCameraShakeBase> CameraShake;
 
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -82,6 +89,12 @@ private:
                          const class UDamageType* DamageType,
                          class AController* InstigatedBy,
                          AActor* DamageCauser);
+
     // Updates health on Heal Modifier delta and stops timer then necessary 
     void HealUpdate();
+
+    // Damage player camera shake effect 
+    void PlayCameraShake() const;
+
+    void Killed(AController* SlayerController) const;
 };
